@@ -1,0 +1,122 @@
+import { Box, Container, Heading, Spinner, Stack } from '@chakra-ui/react'
+import React from 'react'
+import { Column } from 'react-table'
+import { AccountResponse } from '../api/generated'
+import CustomAlertDialog from '../components/CustomAlertDialog'
+import CustomButton from '../components/CustomButton'
+import CreateUpdateAccountModal from '../components/form/CreateUpdateAccountModal'
+import CustomTable, {
+  createDefaultColumn,
+} from '../components/table/CustomTable'
+import { useAppDispatch, useRequireAuth } from '../hooks/hooks'
+import { DeleteAccountAsync, useAccounts } from '../redux/accountsSlice'
+
+const Accounts = () => {
+  const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
+  const [createIsOpen, setCreateIsOpen] = React.useState(false)
+  const [updateIsOpen, setUpdateIsOpen] = React.useState(false)
+  const [accountToDelete, setAccountToDelete] =
+    React.useState<AccountResponse | null>(null)
+  const [accountIdToUpdate, setAccountIdToUpdate] = React.useState<
+    number | null
+  >(null)
+
+  useRequireAuth()
+  const dispatch = useAppDispatch()
+  const { accounts, status: accountsStatus } = useAccounts()
+
+  const deleteClickHandler = (obj: AccountResponse) => {
+    setDeleteIsOpen(true)
+    setAccountToDelete(obj)
+  }
+
+  const updateClickHandler = (obj: AccountResponse) => {
+    setUpdateIsOpen(true)
+    setAccountIdToUpdate(obj.id)
+  }
+
+  const deleteSubmitHandler = () => {
+    dispatch(DeleteAccountAsync(accountToDelete!.id))
+    setDeleteIsOpen(false)
+    setAccountToDelete(null)
+  }
+
+  const columns: Column<AccountResponse>[] = [
+    createDefaultColumn({ header: 'Id', accessor: (x) => x.id }),
+    createDefaultColumn({
+      header: 'GoogleAds AccountId',
+      accessor: (x) => x.googleAdsAccountId,
+    }),
+    createDefaultColumn({
+      header: 'GoogleAds AccountName',
+      accessor: (x) => x.googleAdsAccountName,
+    }),
+    createDefaultColumn({
+      header: 'Created',
+      accessor: (x) => new Date(x.createdDate),
+      sortType: 'datetime',
+      Cell: ({ value }: { value: Date }) => value.toLocaleString(),
+    }),
+    createDefaultColumn({
+      header: 'Actions',
+      accessor: (x) => x,
+      disableSortBy: true,
+      Cell: ({ value }) => (
+        <>
+          <CustomButton
+            title="Edit"
+            color="green"
+            onClickHandler={() => updateClickHandler(value)}
+          />
+          <CustomButton
+            title="Delete"
+            color="red"
+            onClickHandler={() => deleteClickHandler(value)}
+          />
+        </>
+      ),
+    }),
+  ]
+
+  return (
+    <Container paddingTop="150px" maxW={'150ch'}>
+      <Stack spacing={10}>
+        <Heading as="h1" size="xl">
+          Accounts
+        </Heading>
+        <Box>
+          <CustomButton
+            title="Create account"
+            onClickHandler={() => setCreateIsOpen(true)}
+            color="green"
+          />
+        </Box>
+        {accountsStatus === 'loading' && <Spinner size="lg" />}
+        <CustomTable columns={columns} data={accounts} />
+      </Stack>
+      <CreateUpdateAccountModal
+        title="Create a account"
+        content={`Create a new account.`}
+        isOpen={createIsOpen}
+        onClose={() => setCreateIsOpen(false)}
+        accountId={null}
+      />
+      <CreateUpdateAccountModal
+        title="Update a account"
+        content={`Update an existing account.`}
+        isOpen={updateIsOpen}
+        accountId={accountIdToUpdate}
+        onClose={() => setUpdateIsOpen(false)}
+      />
+      <CustomAlertDialog
+        title="Are you sure that you want to delete"
+        content={`The account ${accountToDelete?.googleAdsAccountName} will be deleted. This action cannot be undone.`}
+        isOpen={deleteIsOpen}
+        onClose={() => setDeleteIsOpen(false)}
+        onSubmit={deleteSubmitHandler}
+      />
+    </Container>
+  )
+}
+
+export default Accounts
