@@ -11,6 +11,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AccountResponse } from './models/AccountResponse';
 export type { ApiErrorResponse } from './models/ApiErrorResponse';
+export type { ClientAssumeResponse } from './models/ClientAssumeResponse';
 export type { ClientResponse } from './models/ClientResponse';
 export type { CreateAccountRequest } from './models/CreateAccountRequest';
 export type { CreateClientRequest } from './models/CreateClientRequest';
@@ -29,6 +30,7 @@ export type { UserResponse } from './models/UserResponse';
 
 export { $AccountResponse } from './schemas/$AccountResponse';
 export { $ApiErrorResponse } from './schemas/$ApiErrorResponse';
+export { $ClientAssumeResponse } from './schemas/$ClientAssumeResponse';
 export { $ClientResponse } from './schemas/$ClientResponse';
 export { $CreateAccountRequest } from './schemas/$CreateAccountRequest';
 export { $CreateClientRequest } from './schemas/$CreateClientRequest';

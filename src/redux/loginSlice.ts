@@ -94,6 +94,14 @@ export const selectLoginState = (state: RootState) => state.login.loginRequest;
 export const selectIsLoggedIn = (state: RootState) => state.login.jwt != null;
 export const selectJwtFullname = (state: RootState) => selectJwtDecoded(state)?.fullName;
 export const selectJwtClientId = (state: RootState) => selectJwtDecoded(state)?.clientId;
+export const selectJwtClient = (state: RootState) => {
+  var jwt = selectJwtDecoded(state)
+  if (!jwt)
+    return null
+    
+  return {clientId: jwt.clientId, clientName: jwt.clientName}
+}
+
 export const selectJwtIsAdmin = (state: RootState) => selectJwtDecoded(state)?.isAdmin;
 export const selectJwtUserId = (state: RootState) => selectJwtDecoded(state)?.userId;
 

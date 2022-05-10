@@ -5,11 +5,6 @@ import {
   HStack,
   Link,
   IconButton,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   useDisclosure,
   useColorModeValue,
   Stack,
@@ -17,16 +12,17 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { appRoutes } from '../../appRoutes'
 import { NavLink } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { logout, selectJwtDecoded } from '../../redux/loginSlice'
+import { useAppSelector } from '../../hooks/hooks'
+import { selectJwtDecoded } from '../../redux/loginSlice'
+import AdminMenu from './AdminMenu'
+import ClientSelector from './ClientSelector'
 
-const Links: {title: string, route: string, requireAdmin?: boolean }[] = [
+const Links: { title: string; route: string; requireAdmin?: boolean }[] = [
   { title: 'Home', route: appRoutes.home },
   { title: 'Users', route: appRoutes.users },
   { title: 'Accounts', route: appRoutes.accounts },
   { title: 'Clients', route: appRoutes.clients, requireAdmin: true },
 ]
-
 
 const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
   <Link
@@ -50,13 +46,12 @@ const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
 )
 
 export default function Header() {
-  const dispatch = useAppDispatch()
-  const jwt = useAppSelector(selectJwtDecoded);
+  const jwt = useAppSelector(selectJwtDecoded)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
-      <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+      <Box as={'header'} bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
             size={'md'}
@@ -65,38 +60,19 @@ export default function Header() {
             display={{ md: 'none' }}
             onClick={isOpen ? onClose : onOpen}
           />
-          <HStack spacing={8} alignItems={'center'}>
-            <Box>Logo</Box>
-            <HStack
-              as={'nav'}
-              spacing={4}
-              display={{ base: 'none', md: 'flex' }}
-            >
-              {Links
-                .filter((x) => !x.requireAdmin || jwt?.isAdmin === true)
-                .map((link) => (
+          <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
+            {Links.filter((x) => !x.requireAdmin || jwt?.isAdmin === true).map(
+              (link) => (
                 <MenuLink to={link.route} key={link.title}>
                   {link.title}
                 </MenuLink>
-              ))}
-            </HStack>
+              )
+            )}
           </HStack>
-          <Flex alignItems={'center'}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded={'full'}
-                variant={'link'}
-                cursor={'pointer'}
-                minW={0}
-              >
-                {jwt?.clientName}{" - "}{jwt?.fullName}
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={() => dispatch(logout())}>Log ud</MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
+          <Box display={{ base: 'none', md: 'flex' }}>
+            {jwt?.isAdmin && <ClientSelector />}
+          </Box>
+          {jwt?.isAdmin && <AdminMenu />}
         </Flex>
 
         {isOpen ? (
@@ -107,6 +83,9 @@ export default function Header() {
                   {link.title}
                 </MenuLink>
               ))}
+              <Box display={{ base: 'flex', md: 'none' }}>
+                {jwt?.isAdmin && <ClientSelector />}
+              </Box>
             </Stack>
           </Box>
         ) : null}

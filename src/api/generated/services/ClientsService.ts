@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ClientAssumeResponse } from '../models/ClientAssumeResponse';
 import type { ClientResponse } from '../models/ClientResponse';
 import type { CreateClientRequest } from '../models/CreateClientRequest';
 import type { UpdateClientRequest } from '../models/UpdateClientRequest';
@@ -82,6 +83,28 @@ id: number,
         return this.httpRequest.request({
             method: 'DELETE',
             url: '/api/v1/Clients/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `<p>Error codes:</p><ul><li><i>20101</i> - The client doesn't exist</li></ul>`,
+            },
+        });
+    }
+
+    /**
+     * [Admin] Assume a specific client
+     * Gain a token with a clientId claim set to the clientId of the client you want to assume.
+     * @param id 
+     * @returns ClientAssumeResponse Success
+     * @throws ApiError
+     */
+    public assumeClient(
+id: number,
+): CancelablePromise<ClientAssumeResponse> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/v1/Clients/{id}/assume',
             path: {
                 'id': id,
             },

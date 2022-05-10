@@ -4,8 +4,8 @@ import { ClientResponse, ApiError, ApiErrorResponse } from '../api/generated';
 import { handleRejected, handlePending, StatusSliceBase, genericApiErrorMessage, initialStateBase, handleSuccess } from './sliceHelper';
 import { RootState } from './store';
 import { useAppSelector, useAppDispatch } from "../hooks/hooks";
-import { selectJwtClientId } from './loginSlice';
 import { useEffect } from 'react';
+import { localStorageAuthUserKey } from './loginSlice';
 
 export interface ClientsState {
   Clients: ClientResponse[];
@@ -14,6 +14,7 @@ export interface ClientsState {
   UpdateClientRequest: StatusSliceBase;
   CreateClientRequest: StatusSliceBase;
   DeleteClientRequest: StatusSliceBase;
+  AssumeClientRequest: StatusSliceBase;
 }
 const initialState: ClientsState = {
   Clients: [],
@@ -21,6 +22,7 @@ const initialState: ClientsState = {
   UpdateClientRequest: { ...initialStateBase },
   CreateClientRequest: { ...initialStateBase },
   DeleteClientRequest: { ...initialStateBase },
+  AssumeClientRequest: { ...initialStateBase },
 };
 
 export const GetClientsAsync = createAsyncThunk(
@@ -62,6 +64,20 @@ export const UpdateClientAsync = createAsyncThunk(
       }
 
       return rejectWithValue(errorTranslations[error.errorCode] || genericApiErrorMessage);
+    }
+  }
+);
+
+export const AssumeClientAsync = createAsyncThunk(
+  'clients/assumeClient',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      var response = await createVeveveApiClient().clients.assumeClient(id)
+      localStorage.setItem(localStorageAuthUserKey, response.jwt);
+      window.location.reload();
+      return response;
+    } catch (err) {
+      return rejectWithValue(genericApiErrorMessage);
     }
   }
 );
@@ -110,6 +126,10 @@ export const ClientsSlice = createSlice({
       handleSuccess(state.DeleteClientRequest);
       state.Clients = state.Clients.filter(a => a.id !== action.payload);
     });
+
+    builder.addCase(AssumeClientAsync.pending, (state) => handlePending(state.AssumeClientRequest));
+    builder.addCase(AssumeClientAsync.rejected, (state, { payload }) => handleRejected(state.AssumeClientRequest, payload as string));
+    builder.addCase(AssumeClientAsync.fulfilled, (state, action) => handleSuccess(state.AssumeClientRequest));
   },
 });
 
