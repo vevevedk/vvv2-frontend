@@ -9,27 +9,25 @@ export default function ClientSelector() {
   const client = useAppSelector(selectJwtClient)
   const { clients, status } = useClients()
 
-  const chakraStyles: ChakraStylesConfig = {
-    container: (provided, state) => ({
-      ...provided,
-      width: "200px"
-    })
-  };
-
   return (
     <>
       {status === 'loading' || client === undefined ? (
         <Spinner size="sm" />
       ) : (
         <Select
-          chakraStyles={chakraStyles}
+          chakraStyles={{
+            container: (provided, state) => ({
+              ...provided,
+              width: "200px"
+            })
+          }}
           size="sm"
           defaultValue={{label: client?.clientName, value: client?.clientId}}
           options={clients.map((c) => ({
             label: c.name,
             value: c.id,
           }))}
-          onChange={(e: any) => {
+          onChange={(e) => {
             e?.value && dispatch(AssumeClientAsync(e.value))
           }}
         />
