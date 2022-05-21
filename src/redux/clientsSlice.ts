@@ -33,6 +33,12 @@ export const GetClientsAsync = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(genericApiErrorMessage);
     }
+  },
+  {
+    condition: (_, {getState}) => {
+      const getClientsState = (getState() as RootState).clients.GetClientsRequest;
+      return getClientsState.status !== "loading" && getClientsState.lastUpdated === null;
+    }
   }
 );
 
@@ -152,17 +158,7 @@ export const selectDeleteClientState = (state: RootState) => state.clients.Delet
 export const useClients = () => {
   var state = useAppSelector(selectClientsState);
   var dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (state.status === "loading")
-      return;
-
-    if (state.lastUpdated === null) {
-      dispatch(GetClientsAsync());
-      return;
-    }
-  }, [dispatch, state.lastUpdated, state.status])
-
+  dispatch(GetClientsAsync());
   return state
 }
 
