@@ -36,8 +36,8 @@ export const GetClientsAsync = createAsyncThunk(
   },
   {
     condition: (_, {getState}) => {
-      const getClientsState = (getState() as RootState).clients.GetClientsRequest;
-      return getClientsState.status !== "loading" && getClientsState.lastUpdated === null;
+      const state = (getState() as RootState).clients.GetClientsRequest;
+      return state.status !== "loading" && state.lastUpdated === null;
     }
   }
 );

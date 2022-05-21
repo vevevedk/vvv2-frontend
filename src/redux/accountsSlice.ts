@@ -5,7 +5,6 @@ import { handleRejected, handlePending, StatusSliceBase, genericApiErrorMessage,
 import { RootState } from './store';
 import { useAppSelector, useAppDispatch } from "../hooks/hooks";
 import { selectJwtClientId } from './loginSlice';
-import { useEffect } from 'react';
 
 export interface AccountsState {
   Accounts: AccountResponse[];
@@ -30,6 +29,12 @@ export const GetAccountsAsync = createAsyncThunk(
       return await createVeveveApiClient().accounts.getAccounts()
     } catch (err) {
       return rejectWithValue(genericApiErrorMessage);
+    }
+  },
+  {
+    condition: (_, {getState}) => {
+      const request = (getState() as RootState).accounts.GetAccountsRequest;
+      return request.status !== "loading" && request.lastUpdated === null;
     }
   }
 );
@@ -133,17 +138,7 @@ export const selectDeleteAccountState = (state: RootState) => state.accounts.Del
 export const useAccounts = () => {
   var state = useAppSelector(selectAccountsState);
   var dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (state.status === "loading")
-      return;
-
-    if (state.lastUpdated === null) {
-      dispatch(GetAccountsAsync());
-      return;
-    }
-  }, [dispatch, state.lastUpdated, state.status])
-
+  dispatch(GetAccountsAsync());
   return state
 }
 

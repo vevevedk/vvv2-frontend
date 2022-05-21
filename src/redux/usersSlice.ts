@@ -31,6 +31,12 @@ export const GetUsersAsync = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(genericApiErrorMessage);
     }
+  },
+  {
+    condition: (_, {getState}) => {
+      const request = (getState() as RootState).users.GetUsersRequest;
+      return request.status !== "loading" && request.lastUpdated === null;
+    }
   }
 );
 
@@ -133,17 +139,7 @@ export const selectDeleteUserState = (state: RootState) => state.users.DeleteUse
 export const useUsers = () => {
   var state = useAppSelector(selectUsersState);
   var dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (state.status === "loading")
-      return;
-
-    if (state.lastUpdated === null) {
-      dispatch(GetUsersAsync());
-      return;
-    }
-  }, [dispatch, state.lastUpdated, state.status])
-
+  dispatch(GetUsersAsync());
   return state
 }
 
