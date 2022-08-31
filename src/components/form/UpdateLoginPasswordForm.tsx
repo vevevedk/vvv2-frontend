@@ -1,22 +1,21 @@
-import { Alert, AlertIcon, Box, Stack } from '@chakra-ui/react'
-import React, { FormEvent, useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { selectUpdateLoginPasswordState, updateLoginPasswordAsync } from '../../redux/loginSlice'
-import CustomInputField, { InputFieldType } from './inputs/CustomInputField'
-import CustomSubmitButton from './inputs/CustomSubmitButton'
+import { Alert, AlertIcon, Box, Stack } from "@chakra-ui/react"
+import { useMutation } from "@tanstack/react-query"
+import React, { FormEvent, useEffect, useState } from "react"
+import { updateLoginPassword } from "../../api/mutations/login/updateLoginPassword"
+import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
+import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
 interface Props {
   resetPasswordToken: string
 }
 
 const UpdateLoginPasswordForm = (props: Props) => {
-  const [password, setPassword] = React.useState('')
+  const [password, setPassword] = React.useState("")
   const [passwordValidated, setPasswordValidated] = React.useState(false)
   const [errorMode, setErrorMode] = useState(false)
   const [tempLockout, setTempLockout] = useState(false)
 
-  var dispatch = useAppDispatch()
-  var updateLoginPasswordState = useAppSelector(selectUpdateLoginPasswordState)
+  const updateLoginPasswordMutation = useMutation(updateLoginPassword)
 
   useEffect(() => {
     if (tempLockout === false) return
@@ -25,8 +24,7 @@ const UpdateLoginPasswordForm = (props: Props) => {
   }, [tempLockout])
 
   const isValid = passwordValidated
-  const isEligible =
-    !tempLockout && updateLoginPasswordState.status !== 'loading'
+  const isEligible = !tempLockout && updateLoginPasswordMutation.isLoading
 
   let handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -37,12 +35,10 @@ const UpdateLoginPasswordForm = (props: Props) => {
 
     setErrorMode(false)
     setTempLockout(true)
-    dispatch(
-      updateLoginPasswordAsync({
-        password,
-        resetPasswordToken: props.resetPasswordToken,
-      })
-    )
+    updateLoginPasswordMutation.mutate({
+      password,
+      resetPasswordToken: props.resetPasswordToken,
+    })
   }
 
   return (
@@ -61,23 +57,19 @@ const UpdateLoginPasswordForm = (props: Props) => {
             minLength={2}
           />
 
-          <CustomSubmitButton
-            disabled={!isEligible}
-            submitting={updateLoginPasswordState.status === 'loading'}
-            title="Update Password"
-          />
+          <CustomSubmitButton disabled={!isEligible} submitting={updateLoginPasswordMutation.isLoading} title="Update Password" />
 
-          {updateLoginPasswordState.status === 'failed' && (
+          {updateLoginPasswordMutation.isError && (
             <Alert status="error">
               <AlertIcon />
-              {updateLoginPasswordState.errorMessage}
+              {(updateLoginPasswordMutation.error as Error).message}
             </Alert>
           )}
 
-          {updateLoginPasswordState.successMessage && (
+          {updateLoginPasswordMutation.isSuccess && (
             <Alert status="success">
               <AlertIcon />
-              {updateLoginPasswordState.successMessage}
+              Your password has been updated. Please login again.
             </Alert>
           )}
         </Stack>

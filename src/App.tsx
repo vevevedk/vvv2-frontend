@@ -1,20 +1,22 @@
-import { Route, Routes } from "react-router-dom";
-import { appRoutes } from "./appRoutes";
-import Header from "./components/header/Header";
-import { useAppSelector } from "./hooks/hooks";
-import ForgotLoginPassword from "./pages/ForgotLoginPassword";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import UpdateLoginPassword from "./pages/UpdateLoginPassword";
-import { selectIsLoggedIn } from "./redux/loginSlice";
-import Users from "./pages/Users";
-import Accounts from "./pages/Accounts";
-import Clients from "./pages/Clients";
+import { Route, Routes } from 'react-router-dom'
+import { appRoutes } from './appRoutes'
+import Header from './components/header/Header'
+import ForgotLoginPassword from './pages/ForgotLoginPassword'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import UpdateLoginPassword from './pages/UpdateLoginPassword'
+import Users from './pages/Users'
+import Accounts from './pages/Accounts'
+import Clients from './pages/Clients'
+import { getDecodedJwtToken } from './api/jwtTokenHelper'
 
 function App() {
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
+  const isLoggedIn =
+    !!getDecodedJwtToken()?.exp &&
+    new Date().getTime() < getDecodedJwtToken()!.exp * 1000
+
   return (
-    <div className="App">
+    <div>
       {isLoggedIn && <Header />}
       <Routes>
         <Route path={appRoutes.home} element={<Home />} />
@@ -22,11 +24,17 @@ function App() {
         <Route path={appRoutes.accounts} element={<Accounts />} />
         <Route path={appRoutes.clients} element={<Clients />} />
         <Route path={appRoutes.login} element={<Login />} />
-        <Route path={appRoutes.forgotLoginPassword} element={<ForgotLoginPassword />} />
-        <Route path={appRoutes.updateLoginPassword} element={<UpdateLoginPassword />} />
+        <Route
+          path={appRoutes.forgotLoginPassword}
+          element={<ForgotLoginPassword />}
+        />
+        <Route
+          path={appRoutes.updateLoginPassword}
+          element={<UpdateLoginPassword />}
+        />
       </Routes>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

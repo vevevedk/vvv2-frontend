@@ -1,27 +1,17 @@
-import { ReactNode } from 'react'
-import {
-  Box,
-  Flex,
-  HStack,
-  Link,
-  IconButton,
-  useDisclosure,
-  useColorModeValue,
-  Stack,
-} from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
-import { appRoutes } from '../../appRoutes'
-import { NavLink } from 'react-router-dom'
-import { useAppSelector } from '../../hooks/hooks'
-import { selectJwtDecoded } from '../../redux/loginSlice'
-import AdminMenu from './AdminMenu'
-import ClientSelector from './ClientSelector'
+import { ReactNode } from "react"
+import { Box, Flex, HStack, Link, IconButton, useDisclosure, useColorModeValue, Stack } from "@chakra-ui/react"
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
+import { appRoutes } from "../../appRoutes"
+import { NavLink } from "react-router-dom"
+import AdminMenu from "./AdminMenu"
+import ClientSelector from "./ClientSelector"
+import { getDecodedJwtToken } from "../../api/jwtTokenHelper"
 
 const Links: { title: string; route: string; requireAdmin?: boolean }[] = [
-  { title: 'Home', route: appRoutes.home },
-  { title: 'Users', route: appRoutes.users },
-  { title: 'Accounts', route: appRoutes.accounts },
-  { title: 'Clients', route: appRoutes.clients, requireAdmin: true },
+  { title: "Home", route: appRoutes.home },
+  { title: "Users", route: appRoutes.users },
+  { title: "Accounts", route: appRoutes.accounts },
+  { title: "Clients", route: appRoutes.clients, requireAdmin: true },
 ]
 
 const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
@@ -29,14 +19,14 @@ const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
     as={NavLink}
     px={2}
     py={1}
-    rounded={'md'}
+    rounded={"md"}
     _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
+      textDecoration: "none",
+      bg: useColorModeValue("gray.200", "gray.700"),
     }}
     _activeLink={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
+      textDecoration: "none",
+      bg: useColorModeValue("gray.200", "gray.700"),
     }}
     outline={undefined}
     to={to}
@@ -46,46 +36,40 @@ const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
 )
 
 export default function Header() {
-  const jwt = useAppSelector(selectJwtDecoded)
+  const jwt = getDecodedJwtToken()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
-      <Box as={'header'} bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
-        <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
+      <Box as={"header"} bg={useColorModeValue("gray.100", "gray.900")} px={4}>
+        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
-            size={'md'}
+            size={"md"}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-            aria-label={'Open Menu'}
-            display={{ md: 'none' }}
+            aria-label={"Open Menu"}
+            display={{ md: "none" }}
             onClick={isOpen ? onClose : onOpen}
           />
-          <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
-            {Links.filter((x) => !x.requireAdmin || jwt?.isAdmin === true).map(
-              (link) => (
-                <MenuLink to={link.route} key={link.title}>
-                  {link.title}
-                </MenuLink>
-              )
-            )}
+          <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
+            {Links.filter((x) => !x.requireAdmin || jwt?.isAdmin === true).map((link) => (
+              <MenuLink to={link.route} key={link.title}>
+                {link.title}
+              </MenuLink>
+            ))}
           </HStack>
-          <Box display={{ base: 'none', md: 'flex' }}>
-            {jwt?.isAdmin && <ClientSelector />}
-          </Box>
+          <Box display={{ base: "none", md: "flex" }}>{jwt?.isAdmin && <ClientSelector />}</Box>
           {jwt?.isAdmin && <AdminMenu />}
         </Flex>
 
         {isOpen ? (
-          <Box pb={4} display={{ md: 'none' }}>
-            <Stack as={'nav'} spacing={4}>
+          <Box pb={4} display={{ md: "none" }}>
+            <Stack as={"nav"} spacing={4}>
               {Links.map((link) => (
                 <MenuLink to={link.route} key={link.title}>
                   {link.title}
                 </MenuLink>
               ))}
-              <Box display={{ base: 'flex', md: 'none' }}>
-                {jwt?.isAdmin && <ClientSelector />}
-              </Box>
+              <Box display={{ base: "flex", md: "none" }}>{jwt?.isAdmin && <ClientSelector />}</Box>
             </Stack>
           </Box>
         ) : null}

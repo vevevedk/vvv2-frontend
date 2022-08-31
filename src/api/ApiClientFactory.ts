@@ -1,5 +1,5 @@
-import { localStorageAuthUserKey } from "../redux/loginSlice";
 import { VeveveApiClient } from "./generated";
+import { localStorageAuthUserKey } from "./localStorageAuthUserKey";
 
 export function createVeveveApiClient() {
     var token = localStorage.getItem(localStorageAuthUserKey);

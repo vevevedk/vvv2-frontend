@@ -3,8 +3,7 @@ Everything in this repo is meant as a veveve to copy when starting a new SPA pro
 
 
 ### Highlights
-- React, Redux toolkit, Typescript, Chakra UI
-- Built on top of this template: `npx create-react-app my-app --template redux-typescript`
+- React, React-Query, Typescript, Chakra UI
 - Built to work with the dotnet-api-veveve backend: https://github.com/ThomasWillumsen/dotnet-api-veveve
 - OpenApi generate api client `npm run generate`.
 - Contains basic login functionality with forgot password, update password

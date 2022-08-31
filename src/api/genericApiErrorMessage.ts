@@ -1,0 +1,1 @@
+export const genericApiErrorMessage = "Unknown error. Please try again later.";

@@ -1,30 +1,26 @@
-import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from '@chakra-ui/react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { logout, selectJwtDecoded } from '../../redux/loginSlice'
+import { Button, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react"
+import { getDecodedJwtToken } from "../../api/jwtTokenHelper"
+import { localStorageAuthUserKey } from "../../api/localStorageAuthUserKey"
+import { appRoutes } from "../../appRoutes"
 
 export default function AdminMenu() {
-  const dispatch = useAppDispatch()
-  const jwt = useAppSelector(selectJwtDecoded)
-  return <Menu>
-    <MenuButton
-      as={Button}
-      rounded={'full'}
-      variant={'link'}
-      cursor={'pointer'}
-      minW={0}
-    >
-      {jwt?.clientName}
-      {' - '}
-      {jwt?.fullName}
-    </MenuButton>
-    <MenuList>
-      <MenuItem onClick={() => dispatch(logout())}>Log ud</MenuItem>
-    </MenuList>
-  </Menu>
+  const jwt = getDecodedJwtToken()
+
+  const logoutHandler = () => {
+    localStorage.removeItem(localStorageAuthUserKey)
+    window.location.href = appRoutes.login;
+  }
+
+  return (
+    <Menu>
+      <MenuButton as={Button} rounded={"full"} variant={"link"} cursor={"pointer"} minW={0}>
+        {jwt?.clientName}
+        {" - "}
+        {jwt?.fullName}
+      </MenuButton>
+      <MenuList>
+        <MenuItem onClick={logoutHandler}>Log ud</MenuItem>
+      </MenuList>
+    </Menu>
+  )
 }

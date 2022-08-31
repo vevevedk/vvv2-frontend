@@ -1,20 +1,20 @@
-import { Alert, AlertIcon, Box, Stack } from '@chakra-ui/react'
-import React, { FormEvent, useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { loginAsync, selectLoginState } from '../../redux/loginSlice'
-import CustomInputField, { InputFieldType } from './inputs/CustomInputField'
-import CustomSubmitButton from './inputs/CustomSubmitButton'
+import { Alert, AlertIcon, Box, Stack } from "@chakra-ui/react"
+import { useMutation } from "@tanstack/react-query"
+import React, { FormEvent, useEffect, useState } from "react"
+import { login } from "../../api/mutations/login/login"
+import { appRoutes } from "../../appRoutes"
+import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
+import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
 const LoginForm = () => {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [email, setEmail] = React.useState("")
+  const [password, setPassword] = React.useState("")
   const [emailValidated, setEmailValidated] = React.useState(false)
   const [passwordValidated, setPasswordValidated] = React.useState(false)
   const [errorMode, setErrorMode] = useState(false)
   const [tempLockout, setTempLockout] = useState(false)
 
-  const loginState = useAppSelector(selectLoginState)
-  const dispatch = useAppDispatch()
+  const loginMutation = useMutation(login)
 
   useEffect(() => {
     if (tempLockout === false) return
@@ -23,7 +23,7 @@ const LoginForm = () => {
   }, [tempLockout])
 
   const isValid = emailValidated && passwordValidated
-  const isEligible = !tempLockout && loginState.status !== 'loading'
+  const isEligible = !tempLockout && !loginMutation.isLoading
 
   let handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -34,7 +34,7 @@ const LoginForm = () => {
 
     setErrorMode(false)
     setTempLockout(true)
-    dispatch(loginAsync({ email, password }))
+    loginMutation.mutate({ email, password }, { onSuccess: () => (window.location.href = appRoutes.home) })
   }
 
   return (
@@ -64,16 +64,12 @@ const LoginForm = () => {
             minLength={2}
           />
 
-          <CustomSubmitButton
-            disabled={!isEligible}
-            submitting={loginState.status === 'loading'}
-            title="Login"
-          />
+          <CustomSubmitButton disabled={!isEligible} submitting={loginMutation.isLoading} title="Login" />
 
-          {loginState.status === 'failed' && (
+          {loginMutation.isError && (
             <Alert status="error">
               <AlertIcon />
-              {loginState.errorMessage}
+              {(loginMutation.error as any).message}
             </Alert>
           )}
         </Stack>

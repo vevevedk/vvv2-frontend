@@ -1,18 +1,15 @@
-import { Alert, AlertIcon, Box, Stack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import { selectJwtIsAdmin } from '../../redux/loginSlice'
-import {
-  UpdateUserAsync,
-  selectUpdateUserState,
-  selectUserById,
-  selectCreateUserState,
-  CreateUserAsync,
-} from '../../redux/usersSlice'
-import CustomModal from '../CustomModal'
-import CustomCheckbox from './inputs/CustomCheckbox'
-import CustomInputField, { InputFieldType } from './inputs/CustomInputField'
-import CustomSubmitButton from './inputs/CustomSubmitButton'
+import { Alert, AlertIcon, Box, Stack } from "@chakra-ui/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import React, { useEffect, useState } from "react"
+import { UserResponse } from "../../api/generated"
+import { getDecodedJwtToken } from "../../api/jwtTokenHelper"
+import { createUser } from "../../api/mutations/users/createUser"
+import { updateUser } from "../../api/mutations/users/updateUser"
+import { getUsers, getUsersQueryKey } from "../../api/queries/getUsers"
+import CustomModal from "../CustomModal"
+import CustomCheckbox from "./inputs/CustomCheckbox"
+import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
+import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
 interface Props {
   isOpen: boolean
@@ -22,19 +19,23 @@ interface Props {
   userId: number | null // if null, create new account
 }
 const CreateUpdateUserModal = (props: Props) => {
-  const [fullName, setFullName] = React.useState('')
-  const [email, setEmail] = React.useState('')
+  const [fullName, setFullName] = React.useState("")
+  const [email, setEmail] = React.useState("")
   const [isAdmin, setIsAdmin] = React.useState(false)
   const [fullNameValidated, setFullNameValidated] = React.useState(false)
   const [emailValidated, setEmailValidated] = React.useState(false)
   const [errorMode, setErrorMode] = useState(false)
   const [loadedUserId, setLoadedUserId] = React.useState<number | null>(null)
 
-  const createState = useAppSelector(selectCreateUserState)
-  const updateState = useAppSelector(selectUpdateUserState)
-  const isCurrentUserAdmin = useAppSelector(selectJwtIsAdmin) || false
-  const userToUpdate = useAppSelector(selectUserById(props.userId))
-  const dispatch = useAppDispatch()
+  const requestBody = { email, fullName, isAdmin }
+
+  const queryClient = useQueryClient()
+  const createUserMutation = useMutation(createUser)
+  const updateUserMutation = useMutation(updateUser)
+  const userToUpdate = useQuery([getUsersQueryKey], getUsers).data?.find((a) => a.id === props.userId)
+
+  const token = getDecodedJwtToken()
+  const isCurrentUserAdmin = token?.isAdmin === true
   const isValid = fullNameValidated && emailValidated
 
   useEffect(() => {
@@ -42,17 +43,19 @@ const CreateUpdateUserModal = (props: Props) => {
     if (userToUpdate && loadedUserId !== userToUpdate.id) {
       setLoadedUserId(userToUpdate.id)
       setEmail(userToUpdate.email)
-      setFullName(userToUpdate.fullName || '')
+      setFullName(userToUpdate.fullName || "")
+      setIsAdmin(userToUpdate.isAdmin)
     }
   }, [userToUpdate, loadedUserId])
 
   const resetAndClose = () => {
-    setEmail('')
-    setFullName('')
+    setFullName("")
+    setEmail("")
     setIsAdmin(false)
-    setErrorMode(false)
     setFullNameValidated(false)
     setEmailValidated(false)
+    setErrorMode(false)
+    setLoadedUserId(null)
     props.onClose()
   }
 
@@ -65,39 +68,40 @@ const CreateUpdateUserModal = (props: Props) => {
     setErrorMode(false)
 
     if (!!userToUpdate)
-      dispatch(
-        UpdateUserAsync({
+      updateUserMutation.mutate(
+        {
           id: userToUpdate!.id,
-          body: { email, fullName, isAdmin },
-        })
-      ).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
+          body: requestBody,
+        },
+        {
+          onSuccess: (response) => {
+            queryClient.setQueryData<UserResponse[]>([getUsersQueryKey], (oldData) =>
+              oldData!.map((user) => (user.id === response.id ? response : user))
+            )
+            resetAndClose()
+          },
+        }
       )
     else
-      dispatch(CreateUserAsync({ email, fullName, isAdmin })).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
-      )
+      createUserMutation.mutate(requestBody, {
+        onSuccess: (response) => {
+          queryClient.setQueryData<UserResponse[]>([getUsersQueryKey], (old) => [...old!, response])
+          resetAndClose()
+        },
+      })
   }
 
   const SubmitButton = (
     <CustomSubmitButton
       disabled={errorMode && !isValid}
-      submitting={
-        createState.status === 'loading' || updateState.status === 'loading'
-      }
+      submitting={createUserMutation.isLoading || updateUserMutation.isLoading}
       title="Save"
       onClickHandler={handleFormSubmit}
     />
   )
 
   return (
-    <CustomModal
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-      title={props.title}
-      content={props.content}
-      submitButton={SubmitButton}
-    >
+    <CustomModal isOpen={props.isOpen} onClose={props.onClose} title={props.title} content={props.content} submitButton={SubmitButton}>
       <Box>
         <form>
           <Stack spacing={3}>
@@ -134,11 +138,10 @@ const CreateUpdateUserModal = (props: Props) => {
               />
             )}
 
-            {(createState.status === 'failed' ||
-              updateState.status === 'failed') && (
+            {(createUserMutation.isError || updateUserMutation.isError) && (
               <Alert status="error">
                 <AlertIcon />
-                {createState.errorMessage ?? updateState.errorMessage}
+                {(createUserMutation.error as Error)?.message ?? (updateUserMutation.error as Error).message}
               </Alert>
             )}
           </Stack>

@@ -1,16 +1,13 @@
-import { Alert, AlertIcon, Box, Stack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import {
-  UpdateClientAsync,
-  selectUpdateClientState,
-  selectClientById,
-  selectCreateClientState,
-  CreateClientAsync,
-} from '../../redux/clientsSlice'
-import CustomModal from '../CustomModal'
-import CustomInputField, { InputFieldType } from './inputs/CustomInputField'
-import CustomSubmitButton from './inputs/CustomSubmitButton'
+import { Alert, AlertIcon, Box, Stack } from "@chakra-ui/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import React, { useEffect, useState } from "react"
+import { ClientResponse } from "../../api/generated"
+import { createClient } from "../../api/mutations/clients/createClient"
+import { updateClient } from "../../api/mutations/clients/updateClient"
+import { getClients, getClientsQueryKey } from "../../api/queries/getClients"
+import CustomModal from "../CustomModal"
+import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
+import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
 interface Props {
   isOpen: boolean
@@ -20,17 +17,18 @@ interface Props {
   clientId: number | null // if null, create new client
 }
 const CreateUpdateClientModal = (props: Props) => {
-  const [name, setName] = React.useState('')
+  const [name, setName] = React.useState("")
   const [nameValidated, setNameValidated] = React.useState(false)
   const [errorMode, setErrorMode] = useState(false)
-  const [loadedClientId, setLoadedClientId] = React.useState<number | null>(
-    null
-  )
+  const [loadedClientId, setLoadedClientId] = React.useState<number | null>(null)
 
-  const createState = useAppSelector(selectCreateClientState)
-  const updateState = useAppSelector(selectUpdateClientState)
-  const clientToUpdate = useAppSelector(selectClientById(props.clientId))
-  const dispatch = useAppDispatch()
+  const requstBody = { name }
+
+  const queryClient = useQueryClient()
+  const createClientMutation = useMutation(createClient)
+  const updateClientMutation = useMutation(updateClient)
+  const clientToUpdate = useQuery([getClientsQueryKey], getClients).data?.find((a) => a.id === props.clientId)
+
   const isValid = nameValidated
 
   useEffect(() => {
@@ -42,9 +40,10 @@ const CreateUpdateClientModal = (props: Props) => {
   }, [clientToUpdate, loadedClientId])
 
   const resetAndClose = () => {
-    setName('')
-    setErrorMode(false)
+    setName("")
     setNameValidated(false)
+    setErrorMode(false)
+    setLoadedClientId(null)
     props.onClose()
   }
 
@@ -57,39 +56,40 @@ const CreateUpdateClientModal = (props: Props) => {
     setErrorMode(false)
 
     if (!!clientToUpdate)
-      dispatch(
-        UpdateClientAsync({
+      updateClientMutation.mutate(
+        {
           id: clientToUpdate!.id,
-          body: { name },
-        })
-      ).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
+          body: requstBody,
+        },
+        {
+          onSuccess: (response) => {
+            queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (oldData) =>
+              oldData!.map((client) => (client.id === response.id ? response : client))
+            )
+            resetAndClose()
+          },
+        }
       )
     else
-      dispatch(CreateClientAsync({ name })).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
-      )
+      createClientMutation.mutate(requstBody, {
+        onSuccess: (response) => {
+          queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) => [...old!, response])
+          resetAndClose()
+        },
+      })
   }
 
   const SubmitButton = (
     <CustomSubmitButton
       disabled={errorMode && !isValid}
-      submitting={
-        createState.status === 'loading' || updateState.status === 'loading'
-      }
+      submitting={createClientMutation.isLoading || updateClientMutation.isLoading}
       title="Save"
       onClickHandler={handleFormSubmit}
     />
   )
 
   return (
-    <CustomModal
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-      title={props.title}
-      content={props.content}
-      submitButton={SubmitButton}
-    >
+    <CustomModal isOpen={props.isOpen} onClose={props.onClose} title={props.title} content={props.content} submitButton={SubmitButton}>
       <Box>
         <form>
           <Stack spacing={3}>
@@ -105,11 +105,10 @@ const CreateUpdateClientModal = (props: Props) => {
               minLength={2} // TODO use openapi generated object
             />
 
-            {(createState.status === 'failed' ||
-              updateState.status === 'failed') && (
+            {(createClientMutation.isError || updateClientMutation.isError) && (
               <Alert status="error">
                 <AlertIcon />
-                {createState.errorMessage ?? updateState.errorMessage}
+                {(createClientMutation.error as Error)?.message ?? (updateClientMutation.error as Error)?.message}
               </Alert>
             )}
           </Stack>

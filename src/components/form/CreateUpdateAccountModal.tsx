@@ -1,16 +1,13 @@
-import { Alert, AlertIcon, Box, Stack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks'
-import {
-  UpdateAccountAsync,
-  selectUpdateAccountState,
-  selectAccountById,
-  selectCreateAccountState,
-  CreateAccountAsync,
-} from '../../redux/accountsSlice'
-import CustomModal from '../CustomModal'
-import CustomInputField, { InputFieldType } from './inputs/CustomInputField'
-import CustomSubmitButton from './inputs/CustomSubmitButton'
+import { Alert, AlertIcon, Box, Stack } from "@chakra-ui/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import React, { useEffect, useState } from "react"
+import { AccountResponse } from "../../api/generated"
+import { createAccount } from "../../api/mutations/accounts/createAccount"
+import { updateAccount } from "../../api/mutations/accounts/updateAccount"
+import { getAccounts, getAccountsQueryKey } from "../../api/queries/getAccounts"
+import CustomModal from "../CustomModal"
+import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
+import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
 interface Props {
   isOpen: boolean
@@ -20,35 +17,42 @@ interface Props {
   accountId: number | null // if null, create new account
 }
 const CreateUpdateAccountModal = (props: Props) => {
-  const [googleAdsAccountId, setGoogleAdsAccountId] = React.useState('')
-  const [googleAdsAccountName, setGoogleAdsAccountName] = React.useState('')
+  const [googleAdsAccountId, setGoogleAdsAccountId] = React.useState("")
+  const [googleAdsAccountName, setGoogleAdsAccountName] = React.useState("")
   const [googleAdsAccountIdValidated, setGoogleAdsAccountIdValidated] = React.useState(false)
   const [googleAdsAccountNameValidated, setGoogleAdsAccountNameValidated] = React.useState(false)
+
+  const requestBody = {
+    googleAdsAccountId,
+    googleAdsAccountName,
+  }
 
   const [errorMode, setErrorMode] = useState(false)
   const [loadedAccountId, setLoadedAccountId] = React.useState<number | null>(null)
 
-  const createState = useAppSelector(selectCreateAccountState)
-  const updateState = useAppSelector(selectUpdateAccountState)
-  const accountToUpdate = useAppSelector(selectAccountById(props.accountId))
-  const dispatch = useAppDispatch()
+  const queryClient = useQueryClient()
+  const updateAccountMutation = useMutation(updateAccount)
+  const createAccountMutation = useMutation(createAccount)
+
+  const accountToUpdate = useQuery([getAccountsQueryKey], getAccounts).data?.find((a) => a.id === props.accountId)
   const isValid = googleAdsAccountIdValidated && googleAdsAccountNameValidated
 
   useEffect(() => {
     // dont load the same account twice or it will overwrite input fields
     if (accountToUpdate && loadedAccountId !== accountToUpdate.id) {
       setLoadedAccountId(accountToUpdate.id)
-      setGoogleAdsAccountId(accountToUpdate.googleAdsAccountId || '')
-      setGoogleAdsAccountName(accountToUpdate.googleAdsAccountName || '')
+      setGoogleAdsAccountId(accountToUpdate.googleAdsAccountId || "")
+      setGoogleAdsAccountName(accountToUpdate.googleAdsAccountName || "")
     }
   }, [accountToUpdate, loadedAccountId])
 
   const resetAndClose = () => {
-    setGoogleAdsAccountId('')
-    setGoogleAdsAccountName('')
-    setErrorMode(false)
+    setGoogleAdsAccountId("")
+    setGoogleAdsAccountName("")
     setGoogleAdsAccountIdValidated(false)
     setGoogleAdsAccountNameValidated(false)
+    setErrorMode(false)
+    setLoadedAccountId(null)
     props.onClose()
   }
 
@@ -61,41 +65,40 @@ const CreateUpdateAccountModal = (props: Props) => {
     setErrorMode(false)
 
     if (!!accountToUpdate)
-      dispatch(
-        UpdateAccountAsync({
+      updateAccountMutation.mutate(
+        {
           id: accountToUpdate!.id,
-          body: { googleAdsAccountId: googleAdsAccountId!, googleAdsAccountName },
-        })
-      ).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
+          body: requestBody,
+        },
+        {
+          onSuccess: (response) => {
+            queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (oldData) =>
+              oldData!.map((acc) => (acc.id === response.id ? response : acc))
+            )
+            resetAndClose()
+          },
+        }
       )
     else
-      dispatch(
-        CreateAccountAsync({ googleAdsAccountId: googleAdsAccountId!, googleAdsAccountName })
-      ).then(
-        (value) => value.meta.requestStatus === 'fulfilled' && resetAndClose()
-      )
+      createAccountMutation.mutate(requestBody, {
+        onSuccess: (response) => {
+          queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (old) => [...old!, response])
+          resetAndClose()
+        },
+      })
   }
 
   const SubmitButton = (
     <CustomSubmitButton
       disabled={errorMode && !isValid}
-      submitting={
-        createState.status === 'loading' || updateState.status === 'loading'
-      }
+      submitting={createAccountMutation.isLoading || updateAccountMutation.isLoading}
       title="Save"
       onClickHandler={handleFormSubmit}
     />
   )
 
   return (
-    <CustomModal
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-      title={props.title}
-      content={props.content}
-      submitButton={SubmitButton}
-    >
+    <CustomModal isOpen={props.isOpen} onClose={props.onClose} title={props.title} content={props.content} submitButton={SubmitButton}>
       <Box>
         <form>
           <Stack spacing={3}>
@@ -123,11 +126,10 @@ const CreateUpdateAccountModal = (props: Props) => {
               minLength={2} // TODO use openapi generated object
             />
 
-            {(createState.status === 'failed' ||
-              updateState.status === 'failed') && (
+            {(createAccountMutation.isError || updateAccountMutation.isError) && (
               <Alert status="error">
                 <AlertIcon />
-                {createState.errorMessage ?? updateState.errorMessage}
+                {(createAccountMutation.error as Error)?.message ?? (updateAccountMutation.error as Error).message}
               </Alert>
             )}
           </Stack>
