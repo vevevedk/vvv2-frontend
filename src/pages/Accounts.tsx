@@ -1,7 +1,7 @@
 import { Box, Container, Heading, Spinner, Stack } from "@chakra-ui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createColumnHelper } from "@tanstack/react-table"
 import React from "react"
-import { Column } from "react-table"
 import { AccountResponse } from "../api/generated"
 import { deleteAccount } from "../api/mutations/accounts/deleteAccount"
 import { getAccounts, getAccountsQueryKey } from "../api/queries/getAccounts"
@@ -38,7 +38,11 @@ const Accounts = () => {
     setAccountToDelete(null)
   }
 
-  const columns: Column<AccountResponse>[] = [
+  
+  const columnHelper = createColumnHelper<AccountResponse>()
+
+  const columns = [
+    columnHelper.accessor(x => x.id, {header: "Id"}),
     createDefaultColumn({ header: "Id", accessor: (x) => x.id }),
     createDefaultColumn({ header: "GoogleAds AccountId", accessor: (x) => x.googleAdsAccountId }),
     createDefaultColumn({ header: "GoogleAds AccountName", accessor: (x) => x.googleAdsAccountName }),

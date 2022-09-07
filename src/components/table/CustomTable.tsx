@@ -1,15 +1,9 @@
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { chakra, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import React from 'react'
-import {
-  Column,
-  useSortBy,
-  useTable,
-  useFilters,
-  FilterProps,
-  Renderer,
-  CellProps,
-} from 'react-table'
+
+import { Column, useReactTable } from '@tanstack/react-table'
+
 
 interface Props {
   columns: Column<any>[] // must be the same as the type of data
@@ -21,7 +15,7 @@ export default function CustomTable(props: Props) {
   var columns = React.useMemo(() => props.columns, [props.columns])
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data, autoResetFilters: false }, useFilters, useSortBy)
+    useReactTable({ columns, data, autoResetFilters: false }, useFilters, useSortBy)
 
   return (
     <Table {...getTableProps()}>
