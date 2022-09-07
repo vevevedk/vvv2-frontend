@@ -9,6 +9,7 @@ import Users from './pages/Users'
 import Accounts from './pages/Accounts'
 import Clients from './pages/Clients'
 import { getDecodedJwtToken } from './api/jwtTokenHelper'
+import SearchTermChecker from './pages/SearchTermChecker'
 
 function App() {
   const isLoggedIn =
@@ -31,6 +32,10 @@ function App() {
         <Route
           path={appRoutes.updateLoginPassword}
           element={<UpdateLoginPassword />}
+        />
+        <Route 
+          path={appRoutes.searchTermChecker}
+          element={<SearchTermChecker />}
         />
       </Routes>
     </div>

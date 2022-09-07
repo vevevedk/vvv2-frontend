@@ -6,4 +6,7 @@ export const appRoutes = {
 	login: "/login",
 	forgotLoginPassword: "/forgot-password",
 	updateLoginPassword: "/update-password",
+
+	// features
+	searchTermChecker: "/search-term-checker",
 };

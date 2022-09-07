@@ -5,7 +5,7 @@ import { getDecodedJwtToken } from "../../api/jwtTokenHelper"
 import { assumeClient } from "../../api/mutations/clients/assumeClient"
 import { getClients, getClientsQueryKey } from "../../api/queries/getClients"
 
-export default function ClientSelector() {
+export default function ClientImpersonationSelector() {
   const token = getDecodedJwtToken()
   const clientsQuery = useQuery([getClientsQueryKey], getClients)
   const assumeClientMutation = useMutation(assumeClient, { onSuccess: () => window.location.reload() })

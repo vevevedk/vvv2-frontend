@@ -4,7 +4,7 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons"
 import { appRoutes } from "../../appRoutes"
 import { NavLink } from "react-router-dom"
 import AdminMenu from "./AdminMenu"
-import ClientSelector from "./ClientSelector"
+import ClientImpersonationSelector from "./ClientImpersonationSelector"
 import { getDecodedJwtToken } from "../../api/jwtTokenHelper"
 
 const Links: { title: string; route: string; requireAdmin?: boolean }[] = [
@@ -12,6 +12,7 @@ const Links: { title: string; route: string; requireAdmin?: boolean }[] = [
   { title: "Users", route: appRoutes.users },
   { title: "Accounts", route: appRoutes.accounts },
   { title: "Clients", route: appRoutes.clients, requireAdmin: true },
+  { title: "Search Term Checker", route: appRoutes.searchTermChecker },
 ]
 
 const MenuLink = ({ children, to }: { children: ReactNode; to: string }) => (
@@ -57,7 +58,7 @@ export default function Header() {
               </MenuLink>
             ))}
           </HStack>
-          <Box display={{ base: "none", md: "flex" }}>{jwt?.isAdmin && <ClientSelector />}</Box>
+          <Box display={{ base: "none", md: "flex" }}>{jwt?.isAdmin && <ClientImpersonationSelector />}</Box>
           {jwt?.isAdmin && <AdminMenu />}
         </Flex>
 
@@ -69,7 +70,7 @@ export default function Header() {
                   {link.title}
                 </MenuLink>
               ))}
-              <Box display={{ base: "flex", md: "none" }}>{jwt?.isAdmin && <ClientSelector />}</Box>
+              <Box display={{ base: "flex", md: "none" }}>{jwt?.isAdmin && <ClientImpersonationSelector />}</Box>
             </Stack>
           </Box>
         ) : null}
