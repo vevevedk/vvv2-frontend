@@ -102,7 +102,7 @@ const CreateUpdateClientModal = (props: Props) => {
               value={name}
               placeholder="Test"
               displayErrorIfInvalid={errorMode}
-              minLength={2} // TODO use openapi generated object
+              minLength={2}
             />
 
             {(createClientMutation.isError || updateClientMutation.isError) && (

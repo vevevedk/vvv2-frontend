@@ -50,7 +50,7 @@ const LoginForm = () => {
             value={email}
             placeholder="donald@trump.com"
             displayErrorIfInvalid={errorMode}
-            minLength={2} // TODO use object
+            minLength={2}
           />
           <CustomInputField
             label="Password"

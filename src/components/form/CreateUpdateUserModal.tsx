@@ -114,7 +114,7 @@ const CreateUpdateUserModal = (props: Props) => {
               value={fullName}
               placeholder="Donald Trump"
               displayErrorIfInvalid={errorMode}
-              minLength={2} // TODO use openapi generated object
+              minLength={2}
             />
 
             <CustomInputField

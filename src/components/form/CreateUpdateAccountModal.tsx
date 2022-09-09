@@ -116,7 +116,7 @@ const CreateUpdateAccountModal = (props: Props) => {
               value={googleAdsAccountId}
               placeholder="Test"
               displayErrorIfInvalid={errorMode}
-              minLength={2} // TODO use openapi generated object
+              minLength={2}
             />
 
             <CustomInputField
@@ -128,7 +128,7 @@ const CreateUpdateAccountModal = (props: Props) => {
               value={googleAdsAccountName}
               placeholder="Test"
               displayErrorIfInvalid={errorMode}
-              minLength={2} // TODO use openapi generated object
+              minLength={2}
             />
 
             {(createAccountMutation.isError || updateAccountMutation.isError) && (

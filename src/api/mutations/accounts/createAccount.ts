@@ -4,7 +4,6 @@ import { ApiError, ApiErrorResponse } from "../../generated";
 import { genericApiErrorMessage } from "../../genericApiErrorMessage";
 import { getDecodedJwtToken } from "../../jwtTokenHelper";
 
-// TODO: state.Clients.push(action.payload);
 export const createAccount = async (obj: { googleAdsAccountId: string, googleAdsAccountName: string }) => {
   var clientId = getDecodedJwtToken()?.clientId;
   if (clientId == null) throw new Error("Invalid token");
