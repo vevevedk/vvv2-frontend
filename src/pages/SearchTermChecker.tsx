@@ -1,26 +1,18 @@
-import { Box, Container, Heading, Spinner, Stack } from "@chakra-ui/react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Box, Container, Heading, Stack } from "@chakra-ui/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
-import { Column } from "react-table"
-import { ClientResponse } from "../api/generated"
-import { deleteClient } from "../api/mutations/clients/deleteClient"
+import { AccountResponse } from "../api/generated"
 import { getAccounts, getAccountsQueryKey } from "../api/queries/getAccounts"
-import { getClients, getClientsQueryKey } from "../api/queries/getClients"
-import CustomAlertDialog from "../components/CustomAlertDialog"
-import CustomButton from "../components/CustomButton"
-import CreateUpdateClientModal from "../components/form/CreateUpdateClientModal"
 import AccountSelector from "../components/form/inputs/AccountSelector"
-import CustomTable, { createDefaultColumn } from "../components/table/CustomTable"
 
 const SearchTermChecker = () => {
   const [createIsOpen, setCreateIsOpen] = React.useState(false)
 
-  const [chosenAccountId, setChosenAccountId] = React.useState<string>()
+  const [chosenAccount, setChosenAccount] = React.useState<AccountResponse>()
 
   const queryClient = useQueryClient()
   const getAccountsQuery = useQuery([getAccountsQueryKey], getAccounts)
 
-  
   // const columns: Column<ClientResponse>[] = [
   //   createDefaultColumn({ header: "Id", accessor: (x) => x.id }),
   //   createDefaultColumn({ header: "Name", accessor: (x) => x.name }),
@@ -50,7 +42,7 @@ const SearchTermChecker = () => {
           Search Term Checker
         </Heading>
         <Box>
-          <AccountSelector selectedId={chosenAccountId} onChange={setChosenAccountId}/>
+          <AccountSelector value={chosenAccount} onChange={setChosenAccount} />
         </Box>
         {/* {getClientsQuery.isLoading && <Spinner size="lg" />} */}
         {/* <CustomTable columns={columns} data={getClientsQuery.data || []} /> */}

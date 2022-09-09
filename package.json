@@ -10,6 +10,7 @@
     "@tanstack/react-query": "^4.2.3",
     "@tanstack/react-query-devtools": "^4.2.3",
     "@tanstack/react-table": "^8.5.13",
+    "@tanstack/table-core": "^8.5.13",
     "@types/node": "^18.7.15",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "start": "env-cmd -f .env.local react-scripts start",
-    "generate": "openapi --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api/generated --name VeveveApiClient --exportSchemas true",
+    "generate": "openapi --input https://dev-api.veveve.dk/swagger/v1/swagger.json --output ./src/api/generated --name VeveveApiClient --exportSchemas true",
     "build:development": "env-cmd -f .env.development react-scripts build",
     "build:production": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",

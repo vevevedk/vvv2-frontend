@@ -1,14 +1,14 @@
 import { Box, Container, Heading, Spinner, Stack } from "@chakra-ui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createColumnHelper } from "@tanstack/table-core"
 import React from "react"
-import { Column } from "react-table"
 import { UserResponse } from "../api/generated"
 import { deleteUser } from "../api/mutations/users/deleteUser"
 import { getUsers, getUsersQueryKey } from "../api/queries/getUsers"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateUserModal from "../components/form/CreateUpdateUserModal"
-import CustomTable, { createDefaultColumn } from "../components/table/CustomTable"
+import DataTable from "../components/table/DataTable"
 
 const Users = () => {
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
@@ -38,28 +38,33 @@ const Users = () => {
     setUserToDelete(null)
   }
 
-  const columns: Column<UserResponse>[] = [
-    createDefaultColumn({ header: "Id", accessor: (x) => x.id }),
-    createDefaultColumn({ header: "Email", accessor: (x) => x.email }),
-    createDefaultColumn({ header: "Fullname", accessor: (x) => x.fullName }),
-    createDefaultColumn({ header: "IsAdmin", accessor: (x) => (x.isAdmin ? "Yes" : "No") }),
+  const columnHelper = createColumnHelper<UserResponse>()
 
-    createDefaultColumn({
+  const columns = [
+    columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
+    columnHelper.accessor((x) => x.email, { cell: (info) => info.getValue(), header: "Email" }),
+    columnHelper.accessor((x) => x.fullName, { cell: (info) => info.getValue(), header: "Fullname" }),
+    columnHelper.accessor((x) => x.isAdmin, { cell: (info) => (info.getValue() ? "Yes" : "No"), header: "IsAdmin" }),
+    columnHelper.accessor((x) => new Date(x.createdDate), {
+      cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
-      accessor: (x) => new Date(x.createdDate),
-      sortType: "datetime",
-      Cell: ({ value }: { value: Date }) => value.toLocaleString(),
+      sortingFn: (a, b) => {
+        const aDate = new Date(a.original.createdDate)
+        const bDate = new Date(b.original.createdDate)
+        return aDate.getTime() - bDate.getTime()
+      },
     }),
-    createDefaultColumn({
+    columnHelper.accessor((x) => x, {
+      cell: (info) => {
+        return (
+          <>
+            <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
+            <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
+          </>
+        )
+      },
+      enableSorting: false,
       header: "Actions",
-      accessor: (x) => x,
-      disableSortBy: true,
-      Cell: ({ value }) => (
-        <>
-          <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(value)} />
-          <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(value)} />
-        </>
-      ),
     }),
   ]
 
@@ -73,7 +78,7 @@ const Users = () => {
           <CustomButton title="Create user" onClickHandler={() => setCreateIsOpen(true)} color="green" />
         </Box>
         {getUsersQuery.isLoading && <Spinner size="lg" />}
-        <CustomTable columns={columns} data={getUsersQuery.data || []} />
+        <DataTable columns={columns} data={getUsersQuery.data || []} />
       </Stack>
       <CreateUpdateUserModal
         title="Create a user"

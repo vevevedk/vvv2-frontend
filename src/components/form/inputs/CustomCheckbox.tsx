@@ -1,6 +1,5 @@
-import { QuestionIcon } from '@chakra-ui/icons'
-import { Checkbox, FormControl, FormLabel, Tooltip } from '@chakra-ui/react'
-import { useState } from 'react'
+import { QuestionIcon } from "@chakra-ui/icons"
+import { Checkbox, FormControl, FormLabel, Tooltip } from "@chakra-ui/react"
 
 interface Props {
   label: string
@@ -11,18 +10,11 @@ interface Props {
 }
 
 const CustomCheckbox = (props: Props) => {
-  const [isChecked, setIsChecked] = useState(props.isChecked ?? false)
-
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsChecked(event.target.checked)
-    props.onChangeHandler(event.target.checked)
-  }
-
   return (
     <>
       <FormControl>
         <FormLabel htmlFor={props.name}>
-          {props.label}{' '}
+          {props.label}{" "}
           {props.tooltip && (
             <Tooltip label={props.tooltip}>
               <QuestionIcon />
@@ -32,8 +24,8 @@ const CustomCheckbox = (props: Props) => {
         <Checkbox
           spacing="3"
           name={props.name}
-          isChecked={isChecked}
-          onChange={changeHandler}
+          isChecked={props.isChecked}
+          onChange={(e) => props.onChangeHandler(e.target.checked)}
         ></Checkbox>
       </FormControl>
     </>

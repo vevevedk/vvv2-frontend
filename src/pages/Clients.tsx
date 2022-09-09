@@ -1,14 +1,14 @@
 import { Box, Container, Heading, Spinner, Stack } from "@chakra-ui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createColumnHelper } from "@tanstack/table-core"
 import React from "react"
-import { Column } from "react-table"
 import { ClientResponse } from "../api/generated"
 import { deleteClient } from "../api/mutations/clients/deleteClient"
 import { getClients, getClientsQueryKey } from "../api/queries/getClients"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateClientModal from "../components/form/CreateUpdateClientModal"
-import CustomTable, { createDefaultColumn } from "../components/table/CustomTable"
+import DataTable from "../components/table/DataTable"
 
 const Clients = () => {
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
@@ -39,25 +39,30 @@ const Clients = () => {
     setClientToDelete(null)
   }
 
-  const columns: Column<ClientResponse>[] = [
-    createDefaultColumn({ header: "Id", accessor: (x) => x.id }),
-    createDefaultColumn({ header: "Name", accessor: (x) => x.name }),
-    createDefaultColumn({
+  const columnHelper = createColumnHelper<ClientResponse>()
+  const columns = [
+    columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
+    columnHelper.accessor((x) => x.name, { cell: (info) => info.getValue(), header: "Name" }),
+    columnHelper.accessor((x) => new Date(x.createdDate), {
+      cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
-      accessor: (x) => new Date(x.createdDate),
-      sortType: "datetime",
-      Cell: ({ value }: { value: Date }) => value.toLocaleString(),
+      sortingFn: (a, b) => {
+        const aDate = new Date(a.original.createdDate)
+        const bDate = new Date(b.original.createdDate)
+        return aDate.getTime() - bDate.getTime()
+      },
     }),
-    createDefaultColumn({
+    columnHelper.accessor((x) => x, {
+      cell: (info) => {
+        return (
+          <>
+            <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
+            <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
+          </>
+        )
+      },
+      enableSorting: false,
       header: "Actions",
-      accessor: (x) => x,
-      disableSortBy: true,
-      Cell: ({ value }) => (
-        <>
-          <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(value)} />
-          <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(value)} />
-        </>
-      ),
     }),
   ]
 
@@ -71,7 +76,7 @@ const Clients = () => {
           <CustomButton title="Create client" onClickHandler={() => setCreateIsOpen(true)} color="green" />
         </Box>
         {getClientsQuery.isLoading && <Spinner size="lg" />}
-        <CustomTable columns={columns} data={getClientsQuery.data || []} />
+        <DataTable columns={columns} data={getClientsQuery.data || []} />
       </Stack>
       <CreateUpdateClientModal
         title="Create a client"

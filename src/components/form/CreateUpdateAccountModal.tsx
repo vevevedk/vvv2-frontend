@@ -22,6 +22,8 @@ const CreateUpdateAccountModal = (props: Props) => {
   const [googleAdsAccountIdValidated, setGoogleAdsAccountIdValidated] = React.useState(false)
   const [googleAdsAccountNameValidated, setGoogleAdsAccountNameValidated] = React.useState(false)
 
+  console.log("state", googleAdsAccountId);
+
   const requestBody = {
     googleAdsAccountId,
     googleAdsAccountName,
@@ -38,11 +40,14 @@ const CreateUpdateAccountModal = (props: Props) => {
   const isValid = googleAdsAccountIdValidated && googleAdsAccountNameValidated
 
   useEffect(() => {
+    console.log("triggered")
     // dont load the same account twice or it will overwrite input fields
     if (accountToUpdate && loadedAccountId !== accountToUpdate.id) {
-      setLoadedAccountId(accountToUpdate.id)
+
       setGoogleAdsAccountId(accountToUpdate.googleAdsAccountId || "")
       setGoogleAdsAccountName(accountToUpdate.googleAdsAccountName || "")
+      setLoadedAccountId(accountToUpdate.id)
+      console.log("accountToUpdate", accountToUpdate.googleAdsAccountId || "");
     }
   }, [accountToUpdate, loadedAccountId])
 

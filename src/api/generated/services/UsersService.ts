@@ -39,19 +39,13 @@ requestBody?: CreateUserRequest,
     /**
      * Get Users for a Client
      * Will use the client claim from the jwt token.
-     * @param clientId The client id. This is optional and intended for admins only. This will overrule the client id claim from jwt token
      * @returns UserResponse Success
      * @throws ApiError
      */
-    public getUsers(
-clientId?: number,
-): CancelablePromise<Array<UserResponse>> {
+    public getUsers(): CancelablePromise<Array<UserResponse>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/v1/Users',
-            query: {
-                'clientId': clientId,
-            },
         });
     }
 

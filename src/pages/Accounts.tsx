@@ -8,7 +8,7 @@ import { getAccounts, getAccountsQueryKey } from "../api/queries/getAccounts"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateAccountModal from "../components/form/CreateUpdateAccountModal"
-import CustomTable, { createDefaultColumn } from "../components/table/CustomTable"
+import DataTable from "../components/table/DataTable"
 
 const Accounts = () => {
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
@@ -38,30 +38,31 @@ const Accounts = () => {
     setAccountToDelete(null)
   }
 
-  
   const columnHelper = createColumnHelper<AccountResponse>()
 
   const columns = [
-    columnHelper.accessor(x => x.id, {header: "Id"}),
-    createDefaultColumn({ header: "Id", accessor: (x) => x.id }),
-    createDefaultColumn({ header: "GoogleAds AccountId", accessor: (x) => x.googleAdsAccountId }),
-    createDefaultColumn({ header: "GoogleAds AccountName", accessor: (x) => x.googleAdsAccountName }),
-    createDefaultColumn({
+    columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
+    columnHelper.accessor((x) => x.googleAdsAccountId, { cell: (info) => info.getValue(), header: "GoogleAds AccountId" }),
+    columnHelper.accessor((x) => x.googleAdsAccountName, { cell: (info) => info.getValue(), header: "GoogleAds AccountName" }),
+    columnHelper.accessor((x) => new Date(x.createdDate), {
+      cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
-      accessor: (x) => new Date(x.createdDate),
-      sortType: "datetime",
-      Cell: ({ value }: { value: Date }) => value.toLocaleString(),
+      sortingFn: (a, b) => {
+        const aDate = new Date(a.original.createdDate)
+        const bDate = new Date(b.original.createdDate)
+        return aDate.getTime() - bDate.getTime()
+      },
     }),
-    createDefaultColumn({
-      header: "Actions",
-      accessor: (x) => x,
-      disableSortBy: true,
-      Cell: ({ value }) => (
+    columnHelper.accessor((x) => x, {
+      cell: (info) => {
+        return (
         <>
-          <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(value)} />
-          <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(value)} />
+          <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
+          <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
         </>
-      ),
+      )},
+      enableSorting: false,
+      header: "Actions",
     }),
   ]
 
@@ -75,7 +76,7 @@ const Accounts = () => {
           <CustomButton title="Create account" onClickHandler={() => setCreateIsOpen(true)} color="green" />
         </Box>
         {getAccountsQuery.isLoading && <Spinner size="lg" />}
-        <CustomTable columns={columns} data={getAccountsQuery.data || []} />
+        <DataTable columns={columns} data={getAccountsQuery.data || []} />
       </Stack>
       <CreateUpdateAccountModal
         title="Create a account"

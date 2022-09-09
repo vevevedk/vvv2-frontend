@@ -16,7 +16,7 @@ export class SendGridService {
      * @returns any Success
      * @throws ApiError
      */
-    public post(
+    public postApiV1SendGrid(
 requestBody?: Array<SendGridWebhookEventRequest>,
 ): CancelablePromise<any> {
         return this.httpRequest.request({

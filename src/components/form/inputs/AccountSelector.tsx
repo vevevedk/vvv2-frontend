@@ -1,11 +1,12 @@
 import { Spinner } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { Select } from "chakra-react-select"
+import { AccountResponse } from "../../../api/generated"
 import { getAccounts, getAccountsQueryKey } from "../../../api/queries/getAccounts"
 
-interface Props{
-  onChange: (id?: string) => void
-  selectedId?: string
+interface Props {
+  onChange: (value?: AccountResponse) => void
+  value?: AccountResponse
 }
 
 export default function AccountSelector(props: Props) {
@@ -24,11 +25,8 @@ export default function AccountSelector(props: Props) {
             }),
           }}
           size="sm"
-          value={props.selectedId as any}
-          options={accountsQuery.data.map((c) => ({
-            label: c.googleAdsAccountName,
-            value: c.googleAdsAccountId,
-          }))}
+          value={{ label: props.value?.googleAdsAccountName, value: props.value }}
+          options={accountsQuery.data.map((x) => ({ label: x.googleAdsAccountName, value: x }))}
           onChange={(e) => props.onChange(e?.value)}
         />
       )}
