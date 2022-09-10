@@ -69,7 +69,7 @@ const UsersPage = () => {
   ]
 
   return (
-    <Container paddingTop="150px" maxW={"150ch"}>
+    <Container maxW={"150ch"}>
       <Stack spacing={10}>
         <Heading as="h1" size="xl">
           Users

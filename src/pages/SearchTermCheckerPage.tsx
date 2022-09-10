@@ -32,7 +32,7 @@ const SearchTermCheckerPage = () => {
   ]
 
   return (
-    <Container paddingTop="150px" maxW={"150ch"}>
+    <Container maxW={"150ch"}>
       <Stack spacing={10}>
         <Box>
           <Heading as="h1" size="xl">
@@ -43,19 +43,19 @@ const SearchTermCheckerPage = () => {
           <Box>
             <GetSearchTermsForm />
           </Box>
-          <Box>
-            
-          </Box>
-          <Box>
-            {getSearchTermsQuery?.isFetching && <Spinner size="lg" />}
-            {!getSearchTermsQuery?.isFetching && !!getSearchTermsQuery?.data && (
-              <DataTable
-                columns={columns}
-                data={getSearchTermsQuery.data || []}
-                onRowSelectionChange={setSelectedRows}
-              />
-            )}
-          </Box>
+          <Stack spacing={5}>
+            <Box></Box>
+            <Box>
+              {getSearchTermsQuery?.isFetching && <Spinner size="lg" />}
+              {!getSearchTermsQuery?.isFetching && !!getSearchTermsQuery?.data && (
+                <DataTable
+                  columns={columns}
+                  data={getSearchTermsQuery.data || []}
+                  onRowSelectionChange={setSelectedRows}
+                />
+              )}
+            </Box>
+          </Stack>
         </Stack>
       </Stack>
       {/* <CreateUpdateClientModal

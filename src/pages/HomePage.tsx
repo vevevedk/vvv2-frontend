@@ -2,7 +2,7 @@ import { Container, Heading, Stack, Text } from "@chakra-ui/react"
 
 const HomePage = () => {
   return (
-    <Container paddingTop="150px" maxW={"90ch"}>
+    <Container maxW={"90ch"}>
       <Stack spacing={10}>
         <Heading as="h1" size="xl">
           Veveve React App

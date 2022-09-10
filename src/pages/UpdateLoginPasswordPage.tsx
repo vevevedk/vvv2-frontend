@@ -8,7 +8,7 @@ const UpdateLoginPasswordPage = () => {
   const pwToken = httpHelper.getQueryParam('token')
 
   return (
-    <Container paddingTop="150px" maxW={'60ch'}>
+    <Container maxW={'60ch'}>
       <Stack spacing={10}>
         <Stack spacing={4}>
           <Heading as="h1" size="xl">
