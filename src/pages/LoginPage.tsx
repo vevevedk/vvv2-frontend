@@ -3,7 +3,7 @@ import { Link as ReactRouterLink } from "react-router-dom"
 import { appRoutes } from "../appRoutes"
 import LoginForm from "../components/form/LoginForm"
 
-const Login = () => {
+const LoginPage = () => {
   return (
     <Container paddingTop="150px" maxW={"60ch"}>
       <Stack spacing={10}>
@@ -30,4 +30,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage

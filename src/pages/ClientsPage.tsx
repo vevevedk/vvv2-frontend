@@ -2,49 +2,47 @@ import { Box, Container, Heading, Spinner, Stack } from "@chakra-ui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/table-core"
 import React from "react"
-import { UserResponse } from "../api/generated"
-import { deleteUser } from "../api/mutations/users/deleteUser"
-import { getUsers, getUsersQueryKey } from "../api/queries/getUsers"
+import { ClientResponse } from "../api/generated"
+import { deleteClient } from "../api/mutations/clients/deleteClient"
+import { getClients, getClientsQueryKey } from "../api/queries/getClients"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
-import CreateUpdateUserModal from "../components/form/CreateUpdateUserModal"
+import CreateUpdateClientModal from "../components/form/CreateUpdateClientModal"
 import DataTable from "../components/table/DataTable"
 
-const Users = () => {
+const ClientsPage = () => {
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
   const [createIsOpen, setCreateIsOpen] = React.useState(false)
   const [updateIsOpen, setUpdateIsOpen] = React.useState(false)
-  const [userToDelete, setUserToDelete] = React.useState<UserResponse | null>(null)
-  const [userIdToUpdate, setUserIdToUpdate] = React.useState<number | null>(null)
+  const [clientToDelete, setClientToDelete] = React.useState<ClientResponse | null>(null)
+  const [clientIdToUpdate, setClientIdToUpdate] = React.useState<number | null>(null)
 
   const queryClient = useQueryClient()
-  const getUsersQuery = useQuery([getUsersQueryKey], getUsers)
-  const deleteUserMutation = useMutation(deleteUser)
+  const getClientsQuery = useQuery([getClientsQueryKey], getClients)
+  const deleteClientMutation = useMutation(deleteClient)
 
-  const deleteClickHandler = (obj: UserResponse) => {
+  const deleteClickHandler = (obj: ClientResponse) => {
     setDeleteIsOpen(true)
-    setUserToDelete(obj)
+    setClientToDelete(obj)
   }
 
-  const updateClickHandler = (obj: UserResponse) => {
+  const updateClickHandler = (obj: ClientResponse) => {
     setUpdateIsOpen(true)
-    setUserIdToUpdate(obj.id)
+    setClientIdToUpdate(obj.id)
   }
 
   const deleteSubmitHandler = () => {
-    deleteUserMutation.mutate({ id: userToDelete!.id })
-    queryClient.setQueryData<UserResponse[]>([getUsersQueryKey], (old) => old!.filter((a) => a.id !== userToDelete!.id))
+    deleteClientMutation.mutate({ id: clientToDelete!.id })
+    queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) => old!.filter((a) => a.id !== clientToDelete!.id))
+
     setDeleteIsOpen(false)
-    setUserToDelete(null)
+    setClientToDelete(null)
   }
 
-  const columnHelper = createColumnHelper<UserResponse>()
-
+  const columnHelper = createColumnHelper<ClientResponse>()
   const columns = [
     columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
-    columnHelper.accessor((x) => x.email, { cell: (info) => info.getValue(), header: "Email" }),
-    columnHelper.accessor((x) => x.fullName, { cell: (info) => info.getValue(), header: "Fullname" }),
-    columnHelper.accessor((x) => x.isAdmin, { cell: (info) => (info.getValue() ? "Yes" : "No"), header: "IsAdmin" }),
+    columnHelper.accessor((x) => x.name, { cell: (info) => info.getValue(), header: "Name" }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
@@ -72,31 +70,31 @@ const Users = () => {
     <Container paddingTop="150px" maxW={"150ch"}>
       <Stack spacing={10}>
         <Heading as="h1" size="xl">
-          Users
+          Clients
         </Heading>
         <Box>
-          <CustomButton title="Create user" onClickHandler={() => setCreateIsOpen(true)} color="green" />
+          <CustomButton title="Create client" onClickHandler={() => setCreateIsOpen(true)} color="green" />
         </Box>
-        {getUsersQuery.isLoading && <Spinner size="lg" />}
-        <DataTable columns={columns} data={getUsersQuery.data || []} />
+        {getClientsQuery.isLoading && <Spinner size="lg" />}
+        <DataTable columns={columns} data={getClientsQuery.data || []} />
       </Stack>
-      <CreateUpdateUserModal
-        title="Create a user"
-        content={`Create a new user. This will create a new user in the system and send an invitation email to the provided email-address.`}
+      <CreateUpdateClientModal
+        title="Create a client"
+        content={`Create a new client.`}
         isOpen={createIsOpen}
         onClose={() => setCreateIsOpen(false)}
-        userId={null}
+        clientId={null}
       />
-      <CreateUpdateUserModal
-        title="Update a user"
-        content={`Update an existing user.`}
+      <CreateUpdateClientModal
+        title="Update a client"
+        content={`Update an existing client.`}
         isOpen={updateIsOpen}
-        userId={userIdToUpdate}
+        clientId={clientIdToUpdate}
         onClose={() => setUpdateIsOpen(false)}
       />
       <CustomAlertDialog
         title="Are you sure that you want to delete"
-        content={`The user ${userToDelete?.fullName} will be deleted. This action cannot be undone.`}
+        content={`The client ${clientToDelete?.name} will be deleted. This action cannot be undone.`}
         isOpen={deleteIsOpen}
         onClose={() => setDeleteIsOpen(false)}
         onSubmit={deleteSubmitHandler}
@@ -105,4 +103,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default ClientsPage

@@ -10,7 +10,7 @@ import CustomButton from "../components/CustomButton"
 import CreateUpdateAccountModal from "../components/form/CreateUpdateAccountModal"
 import DataTable from "../components/table/DataTable"
 
-const Accounts = () => {
+const AccountsPage = () => {
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
   const [createIsOpen, setCreateIsOpen] = React.useState(false)
   const [updateIsOpen, setUpdateIsOpen] = React.useState(false)
@@ -103,4 +103,4 @@ const Accounts = () => {
   )
 }
 
-export default Accounts
+export default AccountsPage

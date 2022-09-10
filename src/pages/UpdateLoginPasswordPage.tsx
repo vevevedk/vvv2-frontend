@@ -4,7 +4,7 @@ import { httpHelper } from '../utils/httpHelper'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { appRoutes } from '../appRoutes'
 
-const UpdateLoginPassword = () => {
+const UpdateLoginPasswordPage = () => {
   const pwToken = httpHelper.getQueryParam('token')
 
   return (
@@ -30,4 +30,4 @@ const UpdateLoginPassword = () => {
   )
 }
 
-export default UpdateLoginPassword
+export default UpdateLoginPasswordPage

@@ -1,7 +1,7 @@
 import { Container, Heading, Stack, Text } from '@chakra-ui/react'
 import ForgotLoginPasswordForm from '../components/form/ForgotLoginPasswordForm'
 
-const ForgotLoginPassword = () => {
+const ForgotLoginPasswordPage = () => {
   return (
     <Container paddingTop="150px" maxW={'60ch'}>
       <Stack spacing={10}>
@@ -20,4 +20,4 @@ const ForgotLoginPassword = () => {
   )
 }
 
-export default ForgotLoginPassword
+export default ForgotLoginPasswordPage

@@ -7,7 +7,7 @@ import { createUser } from "../../api/mutations/users/createUser"
 import { updateUser } from "../../api/mutations/users/updateUser"
 import { getUsers, getUsersQueryKey } from "../../api/queries/getUsers"
 import CustomModal from "../CustomModal"
-import CustomCheckbox from "./inputs/CustomCheckbox"
+import CustomInputCheckbox from "./inputs/CustomInputCheckbox"
 import CustomInputField, { InputFieldType } from "./inputs/CustomInputField"
 import CustomSubmitButton from "./inputs/CustomSubmitButton"
 
@@ -101,7 +101,13 @@ const CreateUpdateUserModal = (props: Props) => {
   )
 
   return (
-    <CustomModal isOpen={props.isOpen} onClose={props.onClose} title={props.title} content={props.content} submitButton={SubmitButton}>
+    <CustomModal
+      isOpen={props.isOpen}
+      onClose={props.onClose}
+      title={props.title}
+      content={props.content}
+      submitButton={SubmitButton}
+    >
       <Box>
         <form>
           <Stack spacing={3}>
@@ -129,12 +135,12 @@ const CreateUpdateUserModal = (props: Props) => {
             />
 
             {isCurrentUserAdmin && (
-              <CustomCheckbox
+              <CustomInputCheckbox
                 label="Administrator"
                 name="isAdmin"
                 tooltip="If true, the user will be able to log in as an administrator and manage all clients."
-                onChangeHandler={setIsAdmin}
-                isChecked={isAdmin}
+                onChangeHandler={(value) => setIsAdmin(value === "checked")}
+                value={isAdmin === true ? "checked" : "unchecked"}
               />
             )}
 

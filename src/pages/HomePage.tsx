@@ -1,6 +1,6 @@
 import { Container, Heading, Stack, Text } from "@chakra-ui/react"
 
-const Home = () => {
+const HomePage = () => {
   return (
     <Container paddingTop="150px" maxW={"90ch"}>
       <Stack spacing={10}>
@@ -13,4 +13,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default HomePage

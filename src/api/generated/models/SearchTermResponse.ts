@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type GetSearchTermsResponse = {
+export type SearchTermResponse = {
     campaignId?: string;
     campaignName?: string;
     adGroupId?: string;

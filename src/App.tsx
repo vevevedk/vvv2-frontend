@@ -1,15 +1,15 @@
 import { Route, Routes } from "react-router-dom"
 import { appRoutes } from "./appRoutes"
 import Header from "./components/header/Header"
-import ForgotLoginPassword from "./pages/ForgotLoginPassword"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import UpdateLoginPassword from "./pages/UpdateLoginPassword"
-import Accounts from "./pages/Accounts"
-import Clients from "./pages/Clients"
+import ForgotLoginPasswordPage from "./pages/ForgotLoginPasswordPage"
+import HomePage from "./pages/HomePage"
+import LoginPage from "./pages/LoginPage"
+import UpdateLoginPasswordPage from "./pages/UpdateLoginPasswordPage"
+import AccountsPage from "./pages/AccountsPage"
+import ClientsPage from "./pages/ClientsPage"
 import { getDecodedJwtToken } from "./api/jwtTokenHelper"
-import SearchTermChecker from "./pages/SearchTermChecker"
-import Users from "./pages/Users"
+import SearchTermCheckerPage from "./pages/SearchTermCheckerPage"
+import UsersPage from "./pages/UsersPage"
 
 function App() {
   const isLoggedIn = !!getDecodedJwtToken()?.exp && new Date().getTime() < getDecodedJwtToken()!.exp * 1000
@@ -18,14 +18,14 @@ function App() {
     <div>
       {isLoggedIn && <Header />}
       <Routes>
-        <Route path={appRoutes.home} element={<Home />} />
-        <Route path={appRoutes.users} element={<Users />} />
-        <Route path={appRoutes.accounts} element={<Accounts />} />
-        <Route path={appRoutes.clients} element={<Clients />} />
-        <Route path={appRoutes.login} element={<Login />} />
-        <Route path={appRoutes.forgotLoginPassword} element={<ForgotLoginPassword />} />
-        <Route path={appRoutes.updateLoginPassword} element={<UpdateLoginPassword />} />
-        <Route path={appRoutes.searchTermChecker} element={<SearchTermChecker />} />
+        <Route path={appRoutes.home} element={<HomePage />} />
+        <Route path={appRoutes.users} element={<UsersPage />} />
+        <Route path={appRoutes.accounts} element={<AccountsPage />} />
+        <Route path={appRoutes.clients} element={<ClientsPage />} />
+        <Route path={appRoutes.login} element={<LoginPage />} />
+        <Route path={appRoutes.forgotLoginPassword} element={<ForgotLoginPasswordPage />} />
+        <Route path={appRoutes.updateLoginPassword} element={<UpdateLoginPasswordPage />} />
+        <Route path={appRoutes.searchTermChecker} element={<SearchTermCheckerPage />} />
       </Routes>
     </div>
   )
