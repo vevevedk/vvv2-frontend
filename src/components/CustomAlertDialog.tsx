@@ -40,7 +40,7 @@ export default function CustomAlertDialog(props: Props) {
             <Button ref={cancelRef} onClick={props.onClose}>
               Cancel
             </Button>
-            <Button colorScheme='red' ml={3} onClick={props.onSubmit}>
+            <Button colorScheme='blue' ml={3} onClick={props.onSubmit}>
               Proceed
             </Button>
           </AlertDialogFooter>

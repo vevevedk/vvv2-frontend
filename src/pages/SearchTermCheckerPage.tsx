@@ -1,17 +1,20 @@
-import { Box, Container, Heading, Spinner, Stack, StackDivider } from "@chakra-ui/react"
+import { Box, Container, Heading, Spinner, Stack, StackDivider, useToast } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/table-core"
 import React from "react"
 import { SearchTermResponse } from "../api/generated/models/SearchTermResponse"
 import { getSearchTerms, getSearchTermsQueryKey } from "../api/queries/getSearchTerms"
+import CustomAlertDialog from "../components/CustomAlertDialog"
+import CustomButton from "../components/CustomButton"
 import GetSearchTermsForm from "../components/searchTermChecker/GetSearchTermsForm"
 import DataTable from "../components/table/DataTable"
 import DataTableCheckboxColumn from "../components/table/DataTableCheckboxColumn"
 import DataTableCheckboxHeader from "../components/table/DataTableCheckboxHeader"
 
 const SearchTermCheckerPage = () => {
-  const [createIsOpen, setCreateIsOpen] = React.useState(false)
+  const [modalIsOpen, setModalIsOpen] = React.useState<"createNegativeKeywords">()
   const [selectedRows, setSelectedRows] = React.useState<SearchTermResponse[]>([])
+  const toast = useToast()
 
   const getSearchTermsQuery = useQuery<SearchTermResponse[]>([getSearchTermsQueryKey], getSearchTerms as any, {
     enabled: false,
@@ -44,7 +47,14 @@ const SearchTermCheckerPage = () => {
             <GetSearchTermsForm />
           </Box>
           <Stack spacing={5}>
-            <Box></Box>
+            <Box>
+              <CustomButton
+                disabled={selectedRows.length === 0}
+                title="Create negative keywords"
+                color="green"
+                onClickHandler={() => setModalIsOpen("createNegativeKeywords")}
+              />
+            </Box>
             <Box>
               {getSearchTermsQuery?.isFetching && <Spinner size="lg" />}
               {!getSearchTermsQuery?.isFetching && !!getSearchTermsQuery?.data && (
@@ -58,13 +68,21 @@ const SearchTermCheckerPage = () => {
           </Stack>
         </Stack>
       </Stack>
-      {/* <CreateUpdateClientModal
-        title="Create a client"
-        content={`Create a new client.`}
-        isOpen={createIsOpen}
-        onClose={() => setCreateIsOpen(false)}
-        clientId={null}
-      /> */}
+      <CustomAlertDialog
+        title="Create negative keywords"
+        content={`${selectedRows.length} negative keyword(s) will be created.`}
+        isOpen={modalIsOpen === "createNegativeKeywords"}
+        onClose={() => setModalIsOpen(undefined)}
+        onSubmit={() =>
+          toast({
+            title: "TODO",
+            description: "Nothing a happened",
+            status: "success",
+            duration: 9000,
+            isClosable: true,
+          })
+        }
+      />
     </Container>
   )
 }

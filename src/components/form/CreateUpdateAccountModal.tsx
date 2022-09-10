@@ -93,6 +93,7 @@ const CreateUpdateAccountModal = (props: Props) => {
       disabled={errorMode && !isValid}
       submitting={createAccountMutation.isLoading || updateAccountMutation.isLoading}
       title="Save"
+      colorScheme="blue"
       onClickHandler={handleFormSubmit}
     />
   )

@@ -1,9 +1,11 @@
-import { Button } from '@chakra-ui/react'
+import { Button } from "@chakra-ui/react"
 
 interface Props {
   title: string
   submitting: boolean
+  loadingText?: string
   disabled: boolean
+  colorScheme?: "green" | "blue"
   onClickHandler?: () => void
 }
 
@@ -11,8 +13,8 @@ function CustomSubmitButton(props: Props) {
   return (
     <Button
       isLoading={props.submitting}
-      loadingText="Sending.."
-      colorScheme="green"
+      loadingText={props.loadingText || "Sending.."}
+      colorScheme={props.colorScheme || "green"}
       variant="solid"
       isDisabled={props.disabled}
       type="submit"

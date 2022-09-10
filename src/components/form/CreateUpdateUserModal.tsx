@@ -96,6 +96,7 @@ const CreateUpdateUserModal = (props: Props) => {
       disabled={errorMode && !isValid}
       submitting={createUserMutation.isLoading || updateUserMutation.isLoading}
       title="Save"
+      colorScheme="blue"
       onClickHandler={handleFormSubmit}
     />
   )

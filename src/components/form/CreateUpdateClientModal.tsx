@@ -84,6 +84,7 @@ const CreateUpdateClientModal = (props: Props) => {
       disabled={errorMode && !isValid}
       submitting={createClientMutation.isLoading || updateClientMutation.isLoading}
       title="Save"
+      colorScheme="blue"
       onClickHandler={handleFormSubmit}
     />
   )

@@ -55,7 +55,9 @@ const GetSearchTermsForm = () => {
           <CustomSubmitButton
             disabled={errorMode && !isValidForSubmit}
             submitting={getSearchTermsQuery.isFetching}
+            colorScheme="blue"
             title="Fetch Search Terms"
+            loadingText="Fetching..."
           />
         </Box>
       </HStack>

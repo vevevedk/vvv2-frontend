@@ -10,7 +10,8 @@ import {
   Box,
   Text,
   Stack,
-} from '@chakra-ui/react'
+  HStack,
+} from "@chakra-ui/react"
 
 interface Props {
   isOpen: boolean
@@ -30,16 +31,20 @@ export default function CustomModal(props: Props) {
           <ModalHeader>{props.title}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Stack spacing={'8'}>
-              <Text color="gray.500" whiteSpace={'pre-line'}>
+            <Stack spacing={"8"}>
+              <Text color="gray.500" whiteSpace={"pre-line"}>
                 {props.content}
               </Text>
               <Box>{props.children}</Box>
             </Stack>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={props.onClose}>Cancel</Button>
-            {props.submitButton}
+            <HStack>
+              <Box>
+                <Button onClick={props.onClose}>Cancel</Button>
+              </Box>
+              <Box>{props.submitButton}</Box>
+            </HStack>
           </ModalFooter>
         </ModalContent>
       </Modal>
