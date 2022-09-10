@@ -39,6 +39,7 @@ const GetSearchTermsForm = () => {
             name="account"
             isRequired={true}
             value={chosenAccount}
+            displayErrorIfInvalid={errorMode}
             onChange={setChosenAccount}
           />
         </Box>
@@ -47,6 +48,7 @@ const GetSearchTermsForm = () => {
             label="Lookback days"
             name="lookbackDays"
             isRequired={true}
+            displayErrorIfInvalid={errorMode}
             value={lookbackDays}
             onChangeHandler={setLookbackDays}
           />

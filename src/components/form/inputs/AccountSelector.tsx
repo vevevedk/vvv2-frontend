@@ -8,6 +8,7 @@ interface Props {
   label: string
   name: string
   isRequired?: boolean
+  displayErrorIfInvalid?: boolean
   onChange: (value?: AccountResponse) => void
   value?: AccountResponse
 }
@@ -29,6 +30,8 @@ export default function AccountSelector(props: Props) {
             }),
           }}
           id={props.name}
+          isRequired={props.isRequired}
+          isInvalid={props.displayErrorIfInvalid && !props.value && props.isRequired}
           size="sm"
           value={{ label: props.value?.googleAdsAccountName, value: props.value }}
           options={accountsQuery.data.map((x) => ({ label: x.googleAdsAccountName, value: x }))}
