@@ -24,9 +24,10 @@ export default function AccountSelector(props: Props) {
       ) : (
         <Select
           chakraStyles={{
-            container: (provided, state) => ({
+            control: (provided, state) => ({
               ...provided,
               width: "200px",
+              height: "40px",
             }),
           }}
           id={props.name}
