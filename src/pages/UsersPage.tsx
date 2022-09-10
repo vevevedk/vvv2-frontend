@@ -5,6 +5,7 @@ import React from "react"
 import { UserResponse } from "../api/generated"
 import { deleteUser } from "../api/mutations/users/deleteUser"
 import { getUsers, getUsersQueryKey } from "../api/queries/getUsers"
+import ActionMenu from "../components/ActionMenu"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateUserModal from "../components/form/CreateUpdateUserModal"
@@ -41,9 +42,9 @@ const UsersPage = () => {
   const columnHelper = createColumnHelper<UserResponse>()
 
   const columns = [
-    columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
-    columnHelper.accessor((x) => x.email, { cell: (info) => info.getValue(), header: "Email" }),
-    columnHelper.accessor((x) => x.fullName, { cell: (info) => info.getValue(), header: "Fullname" }),
+    columnHelper.accessor((x) => x.id, { header: "Id" }),
+    columnHelper.accessor((x) => x.email, { header: "Email" }),
+    columnHelper.accessor((x) => x.fullName, { header: "Fullname" }),
     columnHelper.accessor((x) => x.isAdmin, { cell: (info) => (info.getValue() ? "Yes" : "No"), header: "IsAdmin" }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
@@ -55,14 +56,15 @@ const UsersPage = () => {
       },
     }),
     columnHelper.accessor((x) => x, {
-      cell: (info) => {
-        return (
-          <>
-            <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
-            <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
-          </>
-        )
-      },
+      cell: (info) => (
+        <ActionMenu
+          title="Actions"
+          actions={[
+            { name: "Edit", onClick: () => updateClickHandler(info.getValue()) },
+            { name: "Delete", onClick: () => deleteClickHandler(info.getValue()) },
+          ]}
+        />
+      ),
       enableSorting: false,
       header: "Actions",
     }),

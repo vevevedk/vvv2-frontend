@@ -5,6 +5,7 @@ import React from "react"
 import { ClientResponse } from "../api/generated"
 import { deleteClient } from "../api/mutations/clients/deleteClient"
 import { getClients, getClientsQueryKey } from "../api/queries/getClients"
+import ActionMenu from "../components/ActionMenu"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateClientModal from "../components/form/CreateUpdateClientModal"
@@ -33,7 +34,9 @@ const ClientsPage = () => {
 
   const deleteSubmitHandler = () => {
     deleteClientMutation.mutate({ id: clientToDelete!.id })
-    queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) => old!.filter((a) => a.id !== clientToDelete!.id))
+    queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) =>
+      old!.filter((a) => a.id !== clientToDelete!.id)
+    )
 
     setDeleteIsOpen(false)
     setClientToDelete(null)
@@ -41,8 +44,8 @@ const ClientsPage = () => {
 
   const columnHelper = createColumnHelper<ClientResponse>()
   const columns = [
-    columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
-    columnHelper.accessor((x) => x.name, { cell: (info) => info.getValue(), header: "Name" }),
+    columnHelper.accessor((x) => x.id, { header: "Id" }),
+    columnHelper.accessor((x) => x.name, { header: "Name" }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
@@ -53,14 +56,15 @@ const ClientsPage = () => {
       },
     }),
     columnHelper.accessor((x) => x, {
-      cell: (info) => {
-        return (
-          <>
-            <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
-            <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
-          </>
-        )
-      },
+      cell: (info) => (
+        <ActionMenu
+          title="Actions"
+          actions={[
+            { name: "Edit", onClick: () => updateClickHandler(info.getValue()) },
+            { name: "Delete", onClick: () => deleteClickHandler(info.getValue()) },
+          ]}
+        />
+      ),
       enableSorting: false,
       header: "Actions",
     }),

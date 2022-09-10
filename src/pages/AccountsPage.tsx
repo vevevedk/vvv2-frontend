@@ -5,6 +5,7 @@ import React from "react"
 import { AccountResponse } from "../api/generated"
 import { deleteAccount } from "../api/mutations/accounts/deleteAccount"
 import { getAccounts, getAccountsQueryKey } from "../api/queries/getAccounts"
+import ActionMenu from "../components/ActionMenu"
 import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateAccountModal from "../components/form/CreateUpdateAccountModal"
@@ -33,7 +34,9 @@ const AccountsPage = () => {
 
   const deleteSubmitHandler = () => {
     deleteAccountMutation.mutate({ id: accountToDelete!.id })
-    queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (old) => old!.filter((a) => a.id !== accountToDelete!.id))
+    queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (old) =>
+      old!.filter((a) => a.id !== accountToDelete!.id)
+    )
     setDeleteIsOpen(false)
     setAccountToDelete(null)
   }
@@ -42,8 +45,8 @@ const AccountsPage = () => {
 
   const columns = [
     columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
-    columnHelper.accessor((x) => x.googleAdsAccountId, { cell: (info) => info.getValue(), header: "GoogleAds AccountId" }),
-    columnHelper.accessor((x) => x.googleAdsAccountName, { cell: (info) => info.getValue(), header: "GoogleAds AccountName" }),
+    columnHelper.accessor((x) => x.googleAdsAccountId, { header: "GoogleAds AccountId" }),
+    columnHelper.accessor((x) => x.googleAdsAccountName, { header: "GoogleAds AccountName" }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
@@ -54,13 +57,15 @@ const AccountsPage = () => {
       },
     }),
     columnHelper.accessor((x) => x, {
-      cell: (info) => {
-        return (
-        <>
-          <CustomButton title="Edit" color="green" onClickHandler={() => updateClickHandler(info.getValue())} />
-          <CustomButton title="Delete" color="red" onClickHandler={() => deleteClickHandler(info.getValue())} />
-        </>
-      )},
+      cell: (info) => (
+        <ActionMenu
+          title="Actions"
+          actions={[
+            { name: "Edit", onClick: () => updateClickHandler(info.getValue()) },
+            { name: "Delete", onClick: () => deleteClickHandler(info.getValue()) },
+          ]}
+        />
+      ),
       enableSorting: false,
       header: "Actions",
     }),
