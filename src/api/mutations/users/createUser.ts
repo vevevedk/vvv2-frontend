@@ -11,5 +11,3 @@ export const createUser = async (obj: { email: string, fullName: string, isAdmin
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const createUserQueryKey = "createUser";

@@ -11,5 +11,3 @@ export const updateUser = async (obj: { id: number, body: { email: string, fullN
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const updateUserQueryKey = "updateUser";

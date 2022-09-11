@@ -11,5 +11,3 @@ export const createAccount = async (obj: { googleAdsAccountId: string, googleAds
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const createAccountQueryKey = "createAccount";

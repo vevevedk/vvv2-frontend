@@ -8,5 +8,3 @@ export const deleteClient = async (obj: { id: number }) => {
     throw new Error(genericApiErrorMessage);
   }
 };
-
-export const deleteClientQueryKey = "deleteClient";

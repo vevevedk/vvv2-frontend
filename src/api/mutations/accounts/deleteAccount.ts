@@ -8,5 +8,3 @@ export const deleteAccount = async (obj: { id: number}) => {
     throw new Error(genericApiErrorMessage);
   }
 };
-
-export const deleteAccountQueryKey = "deleteAccount";

@@ -11,5 +11,3 @@ export const updateClient = async (obj: { id: number, body: { name: string } }) 
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const updateClientQueryKey = "updateClient";

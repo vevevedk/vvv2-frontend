@@ -15,5 +15,3 @@ export const login = async (obj: { email: string; password: string; }) => {
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const loginQueryKey = "login";

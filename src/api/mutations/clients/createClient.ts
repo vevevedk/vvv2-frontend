@@ -11,5 +11,3 @@ export const createClient = async (obj: { name: string }) => {
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const createClientQueryKey = "createClient";

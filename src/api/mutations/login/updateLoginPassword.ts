@@ -11,5 +11,3 @@ export const updateLoginPassword = async (obj: { resetPasswordToken: string; pas
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const updateLoginPasswordQueryKey = "updateLoginPassword";

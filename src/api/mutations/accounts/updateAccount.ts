@@ -11,5 +11,3 @@ export const updateAccount = async (obj: { id: number, body: { googleAdsAccountI
     throw new Error(apiErrorCodeTranslations[error.errorCode] || genericApiErrorMessage);
   }
 };
-
-export const updateAccountMutationKey = "updateAccount";
