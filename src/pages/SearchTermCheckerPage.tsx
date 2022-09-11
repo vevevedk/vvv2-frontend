@@ -10,8 +10,11 @@ import GetSearchTermsForm from "../components/searchTermChecker/GetSearchTermsFo
 import DataTable from "../components/table/DataTable"
 import DataTableCheckboxColumn from "../components/table/DataTableCheckboxColumn"
 import DataTableCheckboxHeader from "../components/table/DataTableCheckboxHeader"
+import { useRequireAuth } from "../hooks/useRequireAuth"
 
 const SearchTermCheckerPage = () => {
+  useRequireAuth()
+
   const [modalIsOpen, setModalIsOpen] = React.useState<"createNegativeKeywords">()
   const [selectedRows, setSelectedRows] = React.useState<SearchTermResponse[]>([])
   const toast = useToast()

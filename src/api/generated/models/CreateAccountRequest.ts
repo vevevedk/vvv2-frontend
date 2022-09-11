@@ -5,5 +5,4 @@
 export type CreateAccountRequest = {
     googleAdsAccountId: string;
     googleAdsAccountName: string;
-    clientId: number;
 };

@@ -6,7 +6,7 @@ interface Props {
   actions: { disabled?: boolean; onClick: () => void; name: string }[]
 }
 
-export default function newFunction(props: Props) {
+export default function ActionMenu(props: Props) {
   return (
     <Menu>
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -14,7 +14,7 @@ export default function newFunction(props: Props) {
       </MenuButton>
       <MenuList>
         {props.actions.map((action) => (
-          <MenuItem isDisabled={action.disabled} onClick={action.onClick}>
+          <MenuItem key={action.name} isDisabled={action.disabled} onClick={action.onClick}>
             {action.name}
           </MenuItem>
         ))}

@@ -9,8 +9,4 @@ export type UpdateUserRequest = {
      * This property requires admin rights to update
      */
     isAdmin?: boolean | null;
-    /**
-     * This property requires admin rights to update
-     */
-    clientId?: number | null;
 };

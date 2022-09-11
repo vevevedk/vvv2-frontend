@@ -6,5 +6,4 @@ export type CreateUserRequest = {
     email: string;
     fullName: string;
     isAdmin: boolean;
-    clientId: number;
 };

@@ -10,8 +10,11 @@ import CustomAlertDialog from "../components/CustomAlertDialog"
 import CustomButton from "../components/CustomButton"
 import CreateUpdateAccountModal from "../components/form/CreateUpdateAccountModal"
 import DataTable from "../components/table/DataTable"
+import { useRequireAuth } from "../hooks/useRequireAuth"
 
 const AccountsPage = () => {
+  useRequireAuth()
+
   const [deleteIsOpen, setDeleteIsOpen] = React.useState(false)
   const [createIsOpen, setCreateIsOpen] = React.useState(false)
   const [updateIsOpen, setUpdateIsOpen] = React.useState(false)
