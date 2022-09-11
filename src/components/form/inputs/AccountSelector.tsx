@@ -19,8 +19,8 @@ export default function AccountSelector(props: Props) {
   return (
     <FormControl isRequired={props.isRequired}>
       <FormLabel htmlFor={props.name}>{props.label}</FormLabel>
-      {!!accountsQuery.isFetching && <Spinner size="sm" />}
-      {!accountsQuery.isFetching && !!accountsQuery.data && (
+      {!!accountsQuery.isLoading && <Spinner size="sm" />}
+      {!accountsQuery.isLoading && !!accountsQuery.data && (
         <Select
           chakraStyles={{
             control: (provided, state) => ({
