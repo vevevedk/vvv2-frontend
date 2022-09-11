@@ -36,11 +36,15 @@ const ClientsPage = () => {
   }
 
   const deleteSubmitHandler = () => {
-    deleteClientMutation.mutate({ id: clientToDelete!.id })
-    queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) =>
-      old!.filter((a) => a.id !== clientToDelete!.id)
+    deleteClientMutation.mutate(
+      { id: clientToDelete!.id },
+      {
+        onSuccess: () =>
+          queryClient.setQueryData<ClientResponse[]>([getClientsQueryKey], (old) =>
+            old!.filter((a) => a.id !== clientToDelete!.id)
+          ),
+      }
     )
-
     setDeleteIsOpen(false)
     setClientToDelete(null)
   }

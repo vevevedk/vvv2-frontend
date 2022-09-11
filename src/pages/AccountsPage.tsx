@@ -36,9 +36,14 @@ const AccountsPage = () => {
   }
 
   const deleteSubmitHandler = () => {
-    deleteAccountMutation.mutate({ id: accountToDelete!.id })
-    queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (old) =>
-      old!.filter((a) => a.id !== accountToDelete!.id)
+    deleteAccountMutation.mutate(
+      { id: accountToDelete!.id },
+      {
+        onSuccess: () =>
+          queryClient.setQueryData<AccountResponse[]>([getAccountsQueryKey], (old) =>
+            old!.filter((a) => a.id !== accountToDelete!.id)
+          ),
+      }
     )
     setDeleteIsOpen(false)
     setAccountToDelete(null)
