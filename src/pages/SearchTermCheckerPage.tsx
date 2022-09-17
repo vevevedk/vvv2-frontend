@@ -1,15 +1,20 @@
-import { Box, Container, Heading, Spinner, Stack, StackDivider, useToast } from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+import { Box, Container, Heading, HStack, Spinner, Stack, StackDivider } from "@chakra-ui/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/table-core"
 import React from "react"
+import { AccountResponse, JobFeatureNameEnum, JobResponse } from "../api/generated"
 import { SearchTermResponse } from "../api/generated/models/SearchTermResponse"
+import { createNegativeKeywords } from "../api/mutations/keywords/createKeywords"
+import { getJobsQueryKey } from "../api/queries/getJobs"
 import { getSearchTerms, getSearchTermsQueryKey } from "../api/queries/getSearchTerms"
 import ActionMenu from "../components/ActionMenu"
 import CustomAlertDialog from "../components/CustomAlertDialog"
+import JobsList from "../components/jobs/JobsList"
 import GetSearchTermsForm from "../components/searchTermChecker/GetSearchTermsForm"
 import DataTable from "../components/table/DataTable"
 import DataTableCheckboxColumn from "../components/table/DataTableCheckboxColumn"
 import DataTableCheckboxHeader from "../components/table/DataTableCheckboxHeader"
+import { useCustomToast } from "../hooks/useCustomToast"
 import { useRequireAuth } from "../hooks/useRequireAuth"
 
 const SearchTermCheckerPage = () => {
@@ -17,14 +22,16 @@ const SearchTermCheckerPage = () => {
 
   const [modalIsOpen, setModalIsOpen] = React.useState<"createNegativeKeywords">()
   const [selectedRows, setSelectedRows] = React.useState<SearchTermResponse[]>([])
-  const toast = useToast()
+  const [chosenAccount, setChosenAccount] = React.useState<AccountResponse>()
+  const toast = useCustomToast()
 
+  const queryClient = useQueryClient()
   const getSearchTermsQuery = useQuery<SearchTermResponse[]>([getSearchTermsQueryKey], getSearchTerms as any, {
     enabled: false,
   })
+  const createNegativeKeywordsMutation = useMutation(createNegativeKeywords)
 
   const columnHelper = createColumnHelper<SearchTermResponse>()
-
   const columns = [
     columnHelper.accessor((x) => x, {
       header: ({ table }) => <DataTableCheckboxHeader table={table} />,
@@ -37,17 +44,44 @@ const SearchTermCheckerPage = () => {
     columnHelper.accessor((x) => x.searchTerm, { header: "Search Term" }),
   ]
 
+  const handleCreateNegativeKeywords = () => {
+    createNegativeKeywordsMutation.mutate(
+      {
+        googleAdsAccountId: chosenAccount?.googleAdsAccountId!,
+        keywords: selectedRows.map((x) => ({
+          adGroupId: x.adGroupId,
+          keywordText: x.searchTerm,
+        })),
+      },
+      {
+        onSuccess: (response) => {
+          toast("Jobs was created", "Job is pending in the Jobs list")
+          setModalIsOpen(undefined)
+          queryClient.setQueryData<JobResponse[]>(
+            [getJobsQueryKey, JobFeatureNameEnum.CREATE_NEGATIVE_KEYWORDS],
+            (old) => [...old!, response]
+          )
+        },
+      }
+    )
+  }
+
   return (
-    <Container maxW={"150ch"}>
+    <Container width={"1500px"} maxW={"100%"}>
       <Stack spacing={10}>
-        <Box>
-          <Heading as="h1" size="xl">
-            Search Term Checker
-          </Heading>
-        </Box>
+        <HStack justifyContent={"space-between"}>
+          <Box>
+            <Heading as="h1" size="xl">
+              Search Term Checker
+            </Heading>
+          </Box>
+          <Box>
+            <JobsList featureName={JobFeatureNameEnum.CREATE_NEGATIVE_KEYWORDS} />
+          </Box>
+        </HStack>
         <Stack spacing={10} divider={<StackDivider borderColor="gray.500" />}>
           <Box>
-            <GetSearchTermsForm />
+            <GetSearchTermsForm chosenAccountChangeHandler={setChosenAccount} />
           </Box>
           <Stack spacing={5}>
             <Box>
@@ -82,15 +116,8 @@ const SearchTermCheckerPage = () => {
         content={`${selectedRows.length} negative keyword(s) will be created.`}
         isOpen={modalIsOpen === "createNegativeKeywords"}
         onClose={() => setModalIsOpen(undefined)}
-        onSubmit={() =>
-          toast({
-            title: "TODO",
-            description: "Nothing happened",
-            status: "success",
-            duration: 9000,
-            isClosable: true,
-          })
-        }
+        onSubmit={handleCreateNegativeKeywords}
+        isSubmitting={createNegativeKeywordsMutation.isLoading}
       />
     </Container>
   )

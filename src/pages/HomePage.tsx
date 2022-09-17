@@ -5,7 +5,7 @@ const HomePage = () => {
   useRequireAuth()
 
   return (
-    <Container maxW={"90ch"}>
+    <Container width={"800px"} maxW={"100%"}>
       <Stack spacing={10}>
         <Heading as="h1" size="xl">
           Veveve React App

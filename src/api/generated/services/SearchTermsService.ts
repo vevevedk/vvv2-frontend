@@ -25,8 +25,8 @@ lookbackDays: number,
             method: 'GET',
             url: '/api/v1/SearchTerms',
             query: {
-                'GoogleAdsCustomerId': googleAdsCustomerId,
-                'LookbackDays': lookbackDays,
+                'googleAdsCustomerId': googleAdsCustomerId,
+                'lookbackDays': lookbackDays,
             },
         });
     }

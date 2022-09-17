@@ -7,7 +7,11 @@ import AccountSelector from "../form/inputs/AccountSelector"
 import CustomInputNumber from "../form/inputs/CustomInputNumber"
 import CustomSubmitButton from "../form/inputs/CustomSubmitButton"
 
-const GetSearchTermsForm = () => {
+interface Props {
+  chosenAccountChangeHandler?: (account?: AccountResponse) => void
+}
+
+const GetSearchTermsForm = (props: Props) => {
   const [chosenAccount, setChosenAccount] = React.useState<AccountResponse>()
   const [lookbackDays, setLookbackDays] = React.useState<number>()
   const [errorMode, setErrorMode] = React.useState(false)
@@ -40,7 +44,10 @@ const GetSearchTermsForm = () => {
             isRequired={true}
             value={chosenAccount}
             displayErrorIfInvalid={errorMode}
-            onChange={setChosenAccount}
+            onChange={(value) => {
+              props.chosenAccountChangeHandler?.(value)
+              setChosenAccount(value)
+            }}
           />
         </Box>
         <Box>

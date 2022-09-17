@@ -5,7 +5,7 @@ import LoginForm from "../components/form/LoginForm"
 
 const LoginPage = () => {
   return (
-    <Container maxW={"60ch"}>
+    <Container width={"500px"} maxW={"100%"}>
       <Stack spacing={10}>
         <Stack spacing={4}>
           <Heading as="h1" size="lg">

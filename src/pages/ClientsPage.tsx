@@ -78,7 +78,7 @@ const ClientsPage = () => {
   ]
 
   return (
-    <Container maxW={"150ch"}>
+    <Container width={"1500px"} maxW={"100%"}>
       <Stack spacing={10}>
         <Heading as="h1" size="xl">
           Clients

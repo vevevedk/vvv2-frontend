@@ -14,6 +14,7 @@ interface Props{
   isOpen: boolean,
   onClose: () => void,
   onSubmit: () => void,
+  isSubmitting?: boolean,
   title: string,
   content: string,
 }
@@ -40,7 +41,7 @@ export default function CustomAlertDialog(props: Props) {
             <Button ref={cancelRef} onClick={props.onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' ml={3} onClick={props.onSubmit}>
+            <Button colorScheme='blue' ml={3} onClick={props.onSubmit} isLoading={props.isSubmitting} disabled={props.isSubmitting}>
               Proceed
             </Button>
           </AlertDialogFooter>

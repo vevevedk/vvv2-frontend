@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "env-cmd -f .env.local react-scripts start",
-    "generate": "openapi --input https://dev-api.veveve.dk/swagger/v1/swagger.json --output ./src/api/generated --name VeveveApiClient",
+    "generate": "openapi --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api/generated --name VeveveApiClient",
     "build:development": "env-cmd -f .env.development react-scripts build",
     "build:production": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",
