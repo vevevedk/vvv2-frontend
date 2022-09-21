@@ -38,6 +38,7 @@ const SearchTermCheckerPage = () => {
       cell: ({ row }) => <DataTableCheckboxColumn row={row} />,
       id: "select",
       enableSorting: false,
+      enableColumnFilter: false,
     }),
     columnHelper.accessor((x) => x.adGroupName, { header: "AdGroup Name" }),
     columnHelper.accessor((x) => x.campaignName, { header: "Campaign Name" }),

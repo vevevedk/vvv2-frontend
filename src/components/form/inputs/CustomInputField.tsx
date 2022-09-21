@@ -1,5 +1,5 @@
-import { FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react"
-import { useEffect } from "react"
+import { FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react"
+import { useEffect, useState } from "react"
 
 export enum InputFieldType {
   text,
@@ -8,9 +8,9 @@ export enum InputFieldType {
 }
 
 interface Props {
-  label: string
-  name: string
-  type: InputFieldType
+  label?: string
+  name?: string
+  type?: InputFieldType
   value: string
   isRequired?: boolean
   placeholder?: string
@@ -19,30 +19,55 @@ interface Props {
   pattern?: string
   displayErrorIfInvalid?: boolean
   errorText?: string
-  onChangeHandler: (value: string) => void
+  list?: string[]
+  debounce?: number
+  onChangeHandler?: (value: string) => void
   onIsValidChangeHandler?: (isValid: boolean) => void
 }
 
 const CustomInputField = ({ onChangeHandler, onIsValidChangeHandler, ...props }: Props) => {
-  const isValid =
-    props.value.length >= (props.minLength ?? 0) &&
-    props.value.length <= (props.maxLength ?? 9999999) &&
-    (!props.pattern || RegExp(props.pattern!).test(props.value))
+  const [value, setValue] = useState<string>(props.value)
 
-  useEffect(() => onIsValidChangeHandler && onIsValidChangeHandler(isValid), [isValid, onIsValidChangeHandler])
+  const isValid =
+    value.length >= (props.minLength ?? 0) &&
+    value.length <= (props.maxLength ?? 9999999) &&
+    (!props.pattern || RegExp(props.pattern!).test(value))
+
+  useEffect(() => setValue(props.value), [props.value])
+  useEffect(() => onIsValidChangeHandler?.(isValid), [isValid, onIsValidChangeHandler])
+
+  useEffect(() => {
+    if (value === props.value) return
+    const timeout = setTimeout(() => onChangeHandler?.(value), props.debounce ?? 0)
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
   return (
     <>
       <FormControl isInvalid={props.displayErrorIfInvalid && !isValid} isRequired={props.isRequired}>
-        <FormLabel htmlFor={props.name}>{props.label}</FormLabel>
-        <Input
-          id={props.name}
-          type={InputFieldType[props.type]}
-          placeholder={props.placeholder}
-          value={props.value}
-          onChange={(event) => onChangeHandler(event.target.value)}
-        />
-        {props.displayErrorIfInvalid && !isValid && <FormErrorMessage>{props.errorText ?? "Field is invalid"}</FormErrorMessage>}
+        {props.label && props.name && <FormLabel htmlFor={props.name}>{props.label}</FormLabel>}
+
+        <Stack>
+          {props.list && props.name && (
+            <datalist id={props.name}>
+              {props.list.map((value, index) => (
+                <option key={index} value={value} />
+              ))}
+            </datalist>
+          )}
+          <Input
+            id={props.name}
+            type={InputFieldType[props.type ?? InputFieldType.text]}
+            placeholder={props.placeholder}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            list={props.name}
+          />
+          {props.displayErrorIfInvalid && !isValid && (
+            <FormErrorMessage>{props.errorText ?? "Field is invalid"}</FormErrorMessage>
+          )}
+        </Stack>
       </FormControl>
     </>
   )

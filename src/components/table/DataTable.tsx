@@ -1,15 +1,22 @@
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
-import { chakra, Flex, Stack, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react"
-import React from "react"
+import { Box, chakra, Flex, Stack, Table as ChakraTable, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react"
 import {
-  useReactTable,
+  ColumnDef,
+  ColumnFiltersState,
+  FilterFn,
   flexRender,
   getCoreRowModel,
-  ColumnDef,
-  SortingState,
-  getSortedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
 } from "@tanstack/react-table"
+import React from "react"
+
+import { rankItem } from "@tanstack/match-sorter-utils"
+import Filter from "./DataTableFilter"
 import DataTablePagination from "./DataTablePagination"
 
 export type Props<Data extends object> = {
@@ -21,6 +28,7 @@ export type Props<Data extends object> = {
 export default function DataTable<Data extends object>({ data, columns, onRowSelectionChange }: Props<Data>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
   const table = useReactTable({
     columns,
@@ -30,9 +38,14 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
     getPaginationRowModel: getPaginationRowModel(),
-    // enableFilters: true,
-    // getFilteredRowModel: getFilteredRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     state: {
+      columnFilters,
       sorting,
       rowSelection,
     },
@@ -45,7 +58,7 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
 
   return (
     <Stack spacing={10}>
-      <Table>
+      <ChakraTable>
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
@@ -53,18 +66,26 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
                 // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = header.column.columnDef.meta
                 return (
-                  <Th key={header.id} onClick={header.column.getToggleSortingHandler()} isNumeric={meta?.isNumeric}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  <Th key={header.id} isNumeric={meta?.isNumeric}>
+                    <Box onClick={header.column.getToggleSortingHandler()}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
 
-                    <chakra.span pl="4">
-                      {header.column.getIsSorted() ? (
-                        header.column.getIsSorted() === "desc" ? (
-                          <TriangleDownIcon aria-label="sorted descending" />
-                        ) : (
-                          <TriangleUpIcon aria-label="sorted ascending" />
-                        )
-                      ) : null}
-                    </chakra.span>
+                      <chakra.span pl="4">
+                        {header.column.getIsSorted() ? (
+                          header.column.getIsSorted() === "desc" ? (
+                            <TriangleDownIcon aria-label="sorted descending" />
+                          ) : (
+                            <TriangleUpIcon aria-label="sorted ascending" />
+                          )
+                        ) : null}
+                      </chakra.span>
+                    </Box>
+
+                    {header.column.getCanFilter() && (
+                      <Box maxWidth={"250px"}>
+                        <Filter column={header.column} table={table} />
+                      </Box>
+                    )}
                   </Th>
                 )
               })}
@@ -86,7 +107,7 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
             </Tr>
           ))}
         </Tbody>
-      </Table>
+      </ChakraTable>
 
       <Flex justifyContent={"center"}>
         <DataTablePagination
@@ -102,4 +123,17 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
       </Flex>
     </Stack>
   )
+}
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
 }
