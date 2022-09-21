@@ -15,7 +15,7 @@ export class KeywordsService {
      * Create keywords for a given Google Ads Customer ID
      * A background job will be created to perform the keyword creation.
      * @param requestBody 
-     * @returns JobResponse Success
+     * @returns JobResponse Created
      * @throws ApiError
      */
     public postKeywords(

@@ -20,7 +20,7 @@ export class JobsService {
 featureName: JobFeatureNameEnum,
 ): CancelablePromise<Array<JobResponse>> {
         return this.httpRequest.request({
-            method: 'POST',
+            method: 'GET',
             url: '/api/v1/Jobs',
             query: {
                 'featureName': featureName,
