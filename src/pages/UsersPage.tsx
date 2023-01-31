@@ -53,9 +53,9 @@ const UsersPage = () => {
 
   const columns = [
     columnHelper.accessor((x) => x.id, { header: "Id" }),
-    columnHelper.accessor((x) => x.email, { header: "Email" }),
-    columnHelper.accessor((x) => x.fullName, { header: "Fullname" }),
-    columnHelper.accessor((x) => x.isAdmin, { cell: (info) => (info.getValue() ? "Yes" : "No"), header: "IsAdmin" }),
+    columnHelper.accessor((x) => x.email, { header: "Email", size: 200 }),
+    columnHelper.accessor((x) => x.fullName, { header: "Fullname", size: 200 }),
+    columnHelper.accessor((x) => x.isAdmin, { cell: (info) => (info.getValue() ? "Yes" : "No"), header: "IsAdmin", size: 200 }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",

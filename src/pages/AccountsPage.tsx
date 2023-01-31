@@ -53,8 +53,8 @@ const AccountsPage = () => {
 
   const columns = [
     columnHelper.accessor((x) => x.id, { cell: (info) => info.getValue(), header: "Id" }),
-    columnHelper.accessor((x) => x.googleAdsAccountId, { header: "GoogleAds AccountId" }),
-    columnHelper.accessor((x) => x.googleAdsAccountName, { header: "GoogleAds AccountName" }),
+    columnHelper.accessor((x) => x.googleAdsAccountId, { header: "GoogleAds AccountId", size: 200 }),
+    columnHelper.accessor((x) => x.googleAdsAccountName, { header: "GoogleAds AccountName", size: 200 }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
@@ -63,6 +63,7 @@ const AccountsPage = () => {
         const bDate = new Date(b.original.createdDate)
         return aDate.getTime() - bDate.getTime()
       },
+      size: 200
     }),
     columnHelper.accessor((x) => x, {
       cell: (info) => (

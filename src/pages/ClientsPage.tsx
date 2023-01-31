@@ -52,7 +52,7 @@ const ClientsPage = () => {
   const columnHelper = createColumnHelper<ClientResponse>()
   const columns = [
     columnHelper.accessor((x) => x.id, { header: "Id" }),
-    columnHelper.accessor((x) => x.name, { header: "Name" }),
+    columnHelper.accessor((x) => x.name, { header: "Name", size: 200 }),
     columnHelper.accessor((x) => new Date(x.createdDate), {
       cell: (info) => info.getValue().toLocaleString(),
       header: "Created",
@@ -61,6 +61,7 @@ const ClientsPage = () => {
         const bDate = new Date(b.original.createdDate)
         return aDate.getTime() - bDate.getTime()
       },
+      size: 200
     }),
     columnHelper.accessor((x) => x, {
       cell: (info) => (

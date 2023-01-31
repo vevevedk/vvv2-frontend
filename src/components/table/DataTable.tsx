@@ -18,6 +18,7 @@ import React from "react"
 import { rankItem } from "@tanstack/match-sorter-utils"
 import Filter from "./DataTableFilter"
 import DataTablePagination from "./DataTablePagination"
+import DataTableColumnResizer from "./DataTableColumnResizer"
 
 export type Props<Data extends object> = {
   data: Data[]
@@ -33,6 +34,7 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
   const table = useReactTable({
     columns,
     data,
+    columnResizeMode: "onChange",
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -58,7 +60,11 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
 
   return (
     <Stack spacing={10}>
-      <ChakraTable>
+      <ChakraTable
+        style={{
+          width: table.getCenterTotalSize(),
+        }}
+      >
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
@@ -66,7 +72,13 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
                 // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = header.column.columnDef.meta
                 return (
-                  <Th key={header.id} isNumeric={meta?.isNumeric}>
+                  <Th
+                    key={header.id}
+                    isNumeric={meta?.isNumeric}
+                    position={"relative"}
+                    borderRight={header.index === headerGroup.headers.length - 1 ? "none" : "1px rgba(0,0,0,0.1) solid"}
+                    style={{ width: header.getSize() }}
+                  >
                     <Box onClick={header.column.getToggleSortingHandler()}>
                       {flexRender(header.column.columnDef.header, header.getContext())}
 
@@ -86,6 +98,13 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
                         <Filter column={header.column} table={table} />
                       </Box>
                     )}
+
+                    <Box position={"absolute"} right={0} top={0} height="100%">
+                      <DataTableColumnResizer
+                        isResizing={header.column.getIsResizing()}
+                        resizeHandler={header.getResizeHandler()}
+                      />
+                    </Box>
                   </Th>
                 )
               })}
@@ -99,7 +118,17 @@ export default function DataTable<Data extends object>({ data, columns, onRowSel
                 // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = cell.column.columnDef.meta
                 return (
-                  <Td key={cell.id} isNumeric={meta?.isNumeric} wordBreak={"break-word"}>
+                  <Td
+                    key={cell.id}
+                    isNumeric={meta?.isNumeric}
+                    wordBreak={"break-word"}
+                    style={{ width: cell.column.getSize() }}
+                    borderRight={
+                      cell.column.getSortIndex() === row.getVisibleCells().length - 1
+                        ? "none"
+                        : "1px rgba(0,0,0,0.1) solid"
+                    }
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Td>
                 )

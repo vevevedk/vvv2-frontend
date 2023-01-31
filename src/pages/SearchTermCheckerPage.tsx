@@ -39,10 +39,11 @@ const SearchTermCheckerPage = () => {
       id: "select",
       enableSorting: false,
       enableColumnFilter: false,
+      size: 25,
     }),
-    columnHelper.accessor((x) => x.adGroupName, { header: "AdGroup Name" }),
-    columnHelper.accessor((x) => x.campaignName, { header: "Campaign Name" }),
-    columnHelper.accessor((x) => x.searchTerm, { header: "Search Term" }),
+    columnHelper.accessor((x) => x.campaignName, { header: "Campaign Name", size: 300 }),
+    columnHelper.accessor((x) => x.adGroupName, { header: "AdGroup Name", size: 300 }),
+    columnHelper.accessor((x) => x.searchTerm, { header: "Search Term", size: 300 }),
   ]
 
   const handleCreateNegativeKeywords = () => {
