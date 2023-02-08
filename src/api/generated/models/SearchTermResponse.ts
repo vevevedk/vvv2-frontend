@@ -12,4 +12,5 @@ export type SearchTermResponse = {
     clicks: number;
     conversions: number;
     conversionValue: number;
+    costMicros: number;
 };

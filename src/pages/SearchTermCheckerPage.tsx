@@ -48,6 +48,7 @@ const SearchTermCheckerPage = () => {
     columnHelper.accessor((x) => x.clicks, { header: "Clicks", size: 150 }),
     columnHelper.accessor((x) => x.conversions, { header: "Conversions", size: 150 }),
     columnHelper.accessor((x) => x.conversionValue, { header: "Conversion Value", size: 150 }),
+    columnHelper.accessor((x) => x.costMicros, { header: "Cost Micros", size: 150 }),
   ]
 
   const handleCreateNegativeKeywords = () => {
